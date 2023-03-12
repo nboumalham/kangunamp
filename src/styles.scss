@@ -1,0 +1,25 @@
+/* You can add global styles to this file, and also import other style files */
+body {
+	margin: 0;
+
+	h1 {
+		font-size: 1.5em;
+		margin: 0.5em 0;
+	}
+
+	ul {
+		margin:0;
+   		padding: 0;
+   		text-indent: 0;
+	
+	li {
+		list-style-type: none;
+		margin:0;
+		span {
+			height: 100%;
+			display: inline-flex;
+			align-items: center;
+		}
+	}
+}
+}

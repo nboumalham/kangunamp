@@ -1,0 +1,5 @@
+<ul class="list-container" #container>
+  <li *ngFor="let item of itemList" class="list-item" [class.selected]="item.selected">
+      <span class="name">{{item.title}}</span>
+  </li>
+</ul>
