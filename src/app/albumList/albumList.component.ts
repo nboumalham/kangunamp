@@ -12,8 +12,8 @@ import { Location } from '@angular/common'
 })
 export class AlbumListComponent extends ListComponent implements OnInit {
 
-  constructor(private location: Location, private router: Router, private route: ActivatedRoute, private jellyfinService: JellyfinService) {
-    super();
+  constructor(router: Router, private route: ActivatedRoute, private jellyfinService: JellyfinService, private location: Location) {
+    super(router);
   }
 
    ngOnInit(): void {

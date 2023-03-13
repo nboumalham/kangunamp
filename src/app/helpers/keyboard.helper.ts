@@ -11,6 +11,10 @@ export abstract class KeyboardHelper {
   abstract handleUpButton() : void;
   abstract handleDownButton() : void;
 
+  public left_button_label : string = "";
+  public middle_button_label : string = "";
+  public right_button_label : string = "";
+
   @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
 

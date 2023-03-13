@@ -11,8 +11,8 @@ import { Location } from '@angular/common'
 })
 export class HomeComponent extends ListComponent implements OnInit {
 
-  constructor(private location: Location, private router: Router) {
-    super();
+  constructor(private location: Location, router: Router) {
+    super(router);
   }
 
    ngOnInit(): void {
@@ -24,10 +24,14 @@ export class HomeComponent extends ListComponent implements OnInit {
     if(item.title === "Music"){
     	this.router.navigate(['artists']);
     }
+    else if(item.title === "Settings"){
+      this.router.navigate(['settings']);
+    }
   }
 
   listItems(): void {
     this.itemList.push(new ListItem("0", "Music", "Jellyfin", true));
-    this.itemList.push(new ListItem("1", "Quit", "Jellyfin", false));
+    this.itemList.push(new ListItem("1", "Settings", "App settings", false));
+    this.itemList.push(new ListItem("2", "Quit", "Jellyfin", false));
   }
 }

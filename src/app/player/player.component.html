@@ -1,10 +1,21 @@
-<div class="now-playing">
-  <div class="album-art">
-    <img src="{{playingTrack.trackImageURL}}" alt="Album Artwork">
+<div class="now-playing-container">
+  <div class="album-image">
+    <img src="{{ playingTrack.trackImageURL }}" alt="Album Image">
   </div>
-  <div class="track-info">
-    <div class="title">{{playingTrack.title}}</div>
-    <div class="artist">{{playingTrack.subtitle}}</div>
-    <div class="album">{{playingTrack.albumName}}</div>
+  <div class="now-playing-info">
+    <h1 class="now-playing-title">{{ playingTrack.title }}</h1>
+    <h2 class="now-playing-artist">{{ playingTrack.subtitle }}</h2>
+  </div>
+  <div class="progress-container">
+  	<div class="progress-bar" [style.width]="playingTrack.progressBarWidth"></div>
+  </div>
+   <div class="time-display">
+    <div class="current-time">{{formatTime(playingTrack.currentTime)}}</div>
+    <div class="duration">{{formatTime(playingTrack.duration)}}</div>
+  </div>
+  <div class="footer-controls">
+    <button class="footer-button">Prev</button>
+    <button class="footer-button">Play</button>
+    <button class="footer-button">Next</button>
   </div>
 </div>

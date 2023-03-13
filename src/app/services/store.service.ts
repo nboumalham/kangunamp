@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
 export class StoreService {
 
 	playing : boolean = false
-	playingTrack : TrackItem = new TrackItem("0", "??", "??", false)
+	playingTrack : TrackItem = new TrackItem("0", "Unknown", "Unknown", false)
 	
 	playingTrackChange: Subject<TrackItem> = new Subject<TrackItem>();
 	
@@ -23,5 +23,11 @@ export class StoreService {
 		this.playing = true;
 		console.log('new track selected');
 		console.log(this.playingTrack.title)
+	}
+
+	updateProgressBar(progressTime : any, currentTime : number , duration : number) {
+		this.playingTrack.progressBarWidth = progressTime;
+		this.playingTrack.currentTime = currentTime;
+		this.playingTrack.duration = duration;
 	}
 }

@@ -1,6 +1,6 @@
 <div class="main-menu" id="mainMenu">
     <router-outlet></router-outlet>
-    <audio #player>
-		<source src="{{trackSource}}" type="audio/ogg">
+    <audio #player (timeupdate)="updateProgressBar()" preload="none">
+		<source src="{{trackSource}}" type="audio/mp3" codecs="mp3">
 	</audio>
 </div>

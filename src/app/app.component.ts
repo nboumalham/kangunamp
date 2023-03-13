@@ -46,12 +46,16 @@ export class AppComponent extends KeyboardHelper implements AfterViewInit {
   }
 
   handleSoftLeftButton() {
-    this.router.navigate(['player'])
   }
 
   handleBackButton() {
     this.location.back();
 
+  }
+
+  updateProgressBar() {
+    const progress = Math.ceil((this.audio.currentTime / this.audio.duration) * 100);
+    this.storeService.updateProgressBar(`${progress}%`, this.audio.currentTime , this.audio.duration);
   }
 
  ngAfterViewInit() {

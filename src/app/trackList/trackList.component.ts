@@ -13,8 +13,8 @@ import { Location } from '@angular/common'
 })
 export class TrackListComponent extends ListComponent implements OnInit {
 
-  constructor(private location: Location, private route: ActivatedRoute, private router: Router, private jellyfinService: JellyfinService, private storeService: StoreService) {
-    super();
+  constructor(private location: Location, private route: ActivatedRoute, router: Router, private jellyfinService: JellyfinService, private storeService: StoreService) {
+    super(router);
   }
 
    ngOnInit(): void {
@@ -25,7 +25,7 @@ export class TrackListComponent extends ListComponent implements OnInit {
   
   selectItem(item : TrackItem) : void {
     this.storeService.setPlayingTrack(item);
-    //this.router.navigate(['player']);
+    this.router.navigate(['player']);
   }
 
   listItems(artistId: string): void {

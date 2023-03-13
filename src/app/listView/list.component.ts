@@ -1,6 +1,8 @@
 import {Component, ElementRef, ViewChild } from '@angular/core';
 import {KeyboardHelper} from '../helpers/keyboard.helper'
 import {ListItem} from './list-item.model';
+import { Location } from '@angular/common'
+import { Router } from '@angular/router';
 
 @Component({
   templateUrl: './list.component.html',
@@ -12,6 +14,13 @@ export abstract class ListComponent extends KeyboardHelper{
   @ViewChild('container') container!: ElementRef;
   public itemList : ListItem[] = [];
   public index = 0;
+
+
+  constructor(protected router: Router) {
+    super();
+    this.left_button_label = "Player";
+  }
+
   
   abstract listItems(parentId? : string): void;
   abstract selectItem(item : ListItem) : void;
@@ -49,6 +58,7 @@ export abstract class ListComponent extends KeyboardHelper{
   }
 
   handleSoftLeftButton() {
+    this.router.navigate(['player']);
   }
 
   handleBackButton() {
