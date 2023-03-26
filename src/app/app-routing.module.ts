@@ -1,16 +1,20 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ArtistListComponent } from './artistList/artistList.component';
-import { AlbumListComponent } from './albumList/albumList.component';
-import { TrackListComponent } from './trackList/trackList.component';
-import { HomeComponent } from './home/home.component';
+import { ListComponent } from './listView/list.component';
 import { PlayerComponent } from './player/player.component';
+import { AuthComponent } from './authView/auth.component';
+//import { SettingsComponent } from './settings/settings.component';
+
 const routes: Routes = [
-  { path: 'home', component: HomeComponent },
+  { path: 'home', component: ListComponent, data: { type: 'home' } },
+  { path: 'settings', component: ListComponent, data: { type: 'settings' } },
+  { path: 'about', component: ListComponent, data: { type: 'about' } },
+  { path: 'themes', component: ListComponent, data: { type: 'themes' } },
+  { path: 'artists', component: ListComponent, data: { type: 'artists' } },
+  { path: 'artists/:id/albums', component: ListComponent, data: { type: 'albums' } },
+  { path: 'albums/:id/tracks', component: ListComponent, data: { type: 'tracks' }  },
   { path: 'player', component: PlayerComponent },
-  { path: 'artists', component: ArtistListComponent },
-  { path: 'artists/:id/albums', component: AlbumListComponent },
-  { path: 'albums/:id/tracks', component: TrackListComponent },
+  { path: 'auth', component: AuthComponent },
   { path: '',   redirectTo: '/home', pathMatch: 'full' },
 ];
 

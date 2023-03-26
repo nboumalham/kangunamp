@@ -1,6 +1,12 @@
 <ul class="list-container" #container>
-  <li *ngFor="let item of itemList" class="list-item" [class.selected]="item.selected">
-      <p class="name">{{item.title}}</p>
+	<li *ngFor="let item of itemList" class="list-item" [class.selected]="item.selected">
+		<p class="name">{{item.title}}</p>
+      	<ng-container *ngIf="item.subtitle.length > 0">
+      		<p class="description">{{item.subtitle}}</p>
+      	</ng-container>
+		<ng-container *ngIf="item.hasChild">
+			<i class="icon" [class.right_arrow_white]="item.selected" [class.right_arrow_black]="!item.selected"></i>
+  		</ng-container>
   </li>
 </ul>
  <div class="footer-controls">

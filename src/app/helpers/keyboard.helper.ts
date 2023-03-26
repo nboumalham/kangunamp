@@ -17,20 +17,19 @@ export abstract class KeyboardHelper {
 
   @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
-
+  event.preventDefault();
+  event.stopPropagation();
+  
   switch (event.keyCode) {
     case KEY_CODE.DOWN_ARROW:
-      console.log("down");
       this.handleDownButton();
       break;
 
     case KEY_CODE.UP_ARROW:
-      console.log("up");
       this.handleUpButton();
       break;
 
     case KEY_CODE.ENTER:
-      console.log("enter");
       this.handleCenterButton();
       break;
 

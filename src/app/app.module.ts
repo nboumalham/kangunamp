@@ -1,30 +1,32 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-
+import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
+
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
-import { ArtistListComponent } from './artistList/artistList.component';
-import { AlbumListComponent } from './albumList/albumList.component';
-import { TrackListComponent } from './trackList/trackList.component';
+import { ListComponent } from './listView/list.component';
 import { PlayerComponent } from './player/player.component';
+import { AuthComponent } from './authView/auth.component';
+
+import { AudioService } from './services/audio.service';
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent,
-    ArtistListComponent,
-    AlbumListComponent,
-    TrackListComponent,
-    PlayerComponent
+    ListComponent,
+    PlayerComponent,
+    AuthComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule 
+    HttpClientModule,
+    FormsModule
   ],
-  providers: [],
+  providers: [AudioService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
