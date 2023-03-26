@@ -1,7 +1,7 @@
 @import '../../assets/themes/default.scss';
 
 	ul.list-container {
-        height: calc(100vh - 60px);
+        height: calc(86vh);
         width: 100vw;
         overflow-y: scroll;
         overflow-x: hidden;
@@ -42,11 +42,10 @@
 			overflow: hidden;
     		text-overflow: ellipsis;
 		}
-		i.icon {
+		p.icon {
 			float: right;
-			margin-left: auto;
-			margin-top: auto;
-			margin-bottom: auto;
+			margin: auto;
+			margin-right : 10px;
 			&:nth-child(3) {
 				margin-left: 0px;	
 			}

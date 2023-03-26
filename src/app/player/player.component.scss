@@ -4,7 +4,7 @@
   --magic-width: calc(min(80vw, 50vh));
   --player-font-size: 5vh;
   $horizontal-player-size: calc(120vh);
-  height: calc(100vh - 60px);
+  height: calc(86vh);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -90,8 +90,6 @@
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    height: calc(100vh - 60px);
-
     .image-container {
       margin-right: 2vw;
     }

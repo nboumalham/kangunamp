@@ -2,26 +2,30 @@
 
 div.header {
 	margin: 0px 2px;
-	border-bottom: 3px solid $primary-text-color;
+	border-bottom: 0.5vh solid $primary-text-color;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 30px;
+    height: 8.5vh;
 
     span.item {
       border: none;
       outline: none;
-      font-size: 1rem;
+      font-size: 5vh;
       color: $primary-text-color;
       overflow: hidden;
       text-align: center;
+      width: 60vw;
       &:first-child {
-      	text-align: left;
-      	padding-left: 8px;
+      	padding-left: 10px;
+        text-align: left;
+        width: 20vw;
+        font-family: initial;
       }
       &:last-child {
       	text-align: right;
       	padding-right: 8px;
+        width: 20vw;
       }
     }
   }
