@@ -28,6 +28,9 @@ export class HeaderComponent implements OnInit {
       case 'loading':
         this.statusLogo = "⏳︎";
         return;
+      case 'ended':
+        this.statusLogo = "⏹︎";
+        return;
       default:
         this.statusLogo = status;
     }
