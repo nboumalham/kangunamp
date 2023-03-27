@@ -137,7 +137,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     const containerHeight = containerElement.offsetHeight;
     const containerScrollTop = containerElement.scrollTop;
     const containerScrollBottom = containerScrollTop + containerHeight;
-    const selectedItemTop = selectedItemElement.offsetTop - 32; //the 30 is the height of the header
+    const selectedItemTop = selectedItemElement.offsetTop - itemHeight; //the 30 is the height of the header
     const selectedItemBottom = selectedItemTop + itemHeight;
 
     if (selectedItemTop < containerScrollTop) {
