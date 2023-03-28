@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SharedService {
   selectedIndexes: number[] = [0];
+  
+  private title = new BehaviorSubject<string>('Jellypod');
 
   getCurrentIndex() {
     console.debug(this.selectedIndexes);
@@ -26,5 +29,14 @@ export class SharedService {
 
   getStackSize() : number {
     return this.selectedIndexes.length
+  }
+
+
+  getTitle() {
+    return this.title.asObservable();
+  }
+
+  setTitle(title: string) {
+    this.title.next(title);
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { AudioService } from '../services/audio.service';
+import { SharedService } from '../services/shared.service';
 
 @Component({
   selector: 'app-header',
@@ -10,8 +11,9 @@ import { AudioService } from '../services/audio.service';
 export class HeaderComponent implements OnInit {
    
   statusLogo : string = "";
+  title: string = '';
 
-  constructor(private audioService: AudioService) {}
+  constructor(private audioService: AudioService, private sharedService : SharedService) {}
 
   ngOnInit(): void {
     this.audioService.getPlayerStatus().subscribe(status => {
@@ -34,6 +36,10 @@ export class HeaderComponent implements OnInit {
       default:
         this.statusLogo = status;
     }
+    });
+
+    this.sharedService.getTitle().subscribe(title => {
+      this.title = title;
     });
   }
 

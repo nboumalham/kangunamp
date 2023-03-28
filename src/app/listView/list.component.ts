@@ -65,10 +65,11 @@ export class ListComponent extends KeyboardHelper implements OnInit {
       this.itemList = fetchedList;
       this.scrollToSelected();
     });
+    this.sharedService.setTitle(this.config.title);
   }
   
   selectItem(item : ListItem) {
-    this.config.onSelectItem(item);
+    this.config.onSelectItem(item, this.itemList);
   };
 
   handleDownButton() {

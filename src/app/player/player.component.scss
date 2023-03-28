@@ -9,7 +9,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
+  
   .image-container {
     .album-image {
       width: var(--magic-width);
@@ -40,7 +40,7 @@
     .now-playing-info {
       .now-playing-title, .now-playing-artist {
         font-size: var(--player-font-size);
-        margin: 1vh 0;
+        margin: 0.2vh 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -54,13 +54,13 @@
     }
 
     .progress-container {
-      margin: 0 auto;
+      margin: 2vh auto;
       width: var(--magic-width);
       height: 1vh;
       background-color: #f2f2f2;
       border-radius: 15px;
     @media screen and (min-width: $horizontal-player-size) {
-      margin: 0;
+      margin: 2vh 0;
     }
       .progress-bar {
         height: 100%;

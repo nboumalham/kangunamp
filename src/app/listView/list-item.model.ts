@@ -26,9 +26,11 @@ export class TrackItem extends ListItem {
   public currentTime : number  = 0;
   public duration : number = 0;
   public playing : boolean = false;
+  public audioUrl : string = "";
 
-    constructor(id: string, title: string, subtitle: string, selected : boolean, artistName? : string, albumName? : string, trackImageURL? : string) {
+    constructor(id: string, title: string, subtitle: string, selected : boolean, artistName? : string, albumName? : string, trackImageURL? : string, audioUrl? : string) {
       super(id, title, subtitle, selected);
+
       if (typeof trackImageURL !== 'undefined') {
         this.trackImageURL = trackImageURL;
       }
@@ -38,6 +40,8 @@ export class TrackItem extends ListItem {
       if (typeof artistName !== 'undefined') {
         this.artistName = artistName;
       }
-      
+      if (typeof audioUrl !== 'undefined') {
+        this.audioUrl = audioUrl;
+      }
   }
 }

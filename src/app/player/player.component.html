@@ -6,6 +6,7 @@
   </div>
   <div class="progress-info-container">
     <div class="now-playing-info">
+      <h2 *ngIf="playlistIndex !== '1 of 1'" class="now-playing-artist">{{ playlistIndex }}</h2>
       <h1 class="now-playing-title">{{ trackName }}</h1>
       <h2 class="now-playing-artist">{{ artistName }}</h2>
     </div>

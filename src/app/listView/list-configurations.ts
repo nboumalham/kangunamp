@@ -5,11 +5,14 @@ import { AudioService } from '../services/audio.service';
 import { JellyfinService } from '../services/jellyfin.service';
 
 export interface ListConfig {
+  title : string;
   fetchList: (selectedIndex?: number, parentId?: string) => Promise<ListItem[]>;
-  onSelectItem: (item: ListItem) => void;
+  onSelectItem: (item: ListItem, items? : ListItem[]) => void;
 }
 
 export const homeViewConfig = (router: Router, audioService: AudioService): ListConfig => ({
+  title: "Home",
+
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [
       new ListItem("0", "Music", "", 0 === selectedIndex, true),
@@ -36,6 +39,7 @@ export const homeViewConfig = (router: Router, audioService: AudioService): List
 });
 
 export const settingsViewConfig = (router: Router): ListConfig => ({
+  title: "Settings",
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [];
     items.push(new ListItem("0", "About", "", 0 === selectedIndex, true));
@@ -53,6 +57,7 @@ export const settingsViewConfig = (router: Router): ListConfig => ({
 });
 
 export const aboutViewConfig = (): ListConfig => ({
+  title: "About",
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [];
     items.push(new ListItem("0", "Device", "iPod Classic", true));
@@ -68,6 +73,7 @@ export const aboutViewConfig = (): ListConfig => ({
 
 });
 export const themesViewConfig = (): ListConfig => ({
+  title: "About",
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [];
     items.push(new ListItem("0", "Light", "",true));
@@ -81,6 +87,7 @@ export const themesViewConfig = (): ListConfig => ({
 
 
 export const artistsViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService): ListConfig => ({
+  title: "Artists",
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [];
     jellyfinService.listArtists().subscribe(
@@ -103,6 +110,7 @@ export const artistsViewConfig = (router: Router, audioService: AudioService, je
 
 
 export const albumsViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService): ListConfig => ({
+  title: "Albums",
   fetchList: async (selectedIndex?: number, parentId?: string): Promise<ListItem[]> => {
     const items: ListItem[] = [];
     if (typeof(parentId) === 'string') jellyfinService.listAlbums(parentId)
@@ -127,27 +135,58 @@ export const albumsViewConfig = (router: Router, audioService: AudioService, jel
 
 
 export const tracksViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService): ListConfig => ({
+  title: "Songs",
   fetchList: async (selectedIndex?: number, parentId?: string): Promise<ListItem[]> => {
-    const items: ListItem[] = [];
-    if (typeof(parentId) === 'string') jellyfinService.listItems(parentId)
-    .subscribe(
-        tracks => {
-          tracks.Items.forEach((track : any, index : number) => {
-          var listItem : ListItem = new ListItem(track.Id, track.Name, track.Artists[0], (index === selectedIndex ? true : false));
-          items.push(listItem);
-          });
-        },
-        error => {
-          console.log(error);
-        });
+    const items: TrackItem[] = [];
+
+    if (typeof parentId === 'string') {
+      const tracks = await jellyfinService.listItems(parentId).toPromise();
+      
+      if (tracks.Items.length > 1) {
+        const tracksTotalTime = tracks.Items.reduce((total: number, track : any) => total + track.RunTimeTicks, 0);
+        items.push(
+          new TrackItem(
+            'play-all',
+            'Play All Tracks',
+            audioService.formatMicrosecondsToMMSS(tracksTotalTime),
+            selectedIndex === 0
+          )
+        );
+      }
+
+      tracks.Items.forEach((track: any, index: number) => {
+        const listItem: TrackItem = new TrackItem(
+          track.Id,
+          track.Name,
+          audioService.formatMicrosecondsToMMSS(track.RunTimeTicks),
+          selectedIndex === (tracks.Items.length > 1 ? index + 1 : index),
+          track.Artists[0],
+          track.Album,
+          jellyfinService.getTrackImageURL(track.Id),
+          jellyfinService.getTrackStream(track.Id)
+        );
+
+        items.push(listItem);
+      });
+    }
+
     return items;
   },
 
-  onSelectItem: (item: ListItem): void => {
-    audioService.setTrackName(item.title);
-    audioService.setArtistName(item.subtitle);
-    audioService.setAudio(jellyfinService.getTrackStream(item.id));
-    audioService.setAlbumImageUrl(jellyfinService.getTrackImageURL(item.id));
-    router.navigate(['player']);
+  onSelectItem: (item: ListItem, items?: ListItem[]): void => {
+    if ('trackImageURL' in item) {
+      const trackItem = item as TrackItem;
+      if(trackItem.id === 'play-all') {
+         if (items) {
+          audioService.setAudioQueue(items.slice(1) as TrackItem[]);
+        } else console.error('The list of tracks sent was empty');
+      }
+      else audioService.setAudioQueue(trackItem);
+      
+      router.navigate(['player']);
+    
+    } else {
+      console.error('Expected a TrackItem, but received a ListItem.');
+    }
   },
 });
