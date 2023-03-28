@@ -10,6 +10,7 @@ const routes: Routes = [
   { path: 'settings', component: ListComponent, data: { type: 'settings' } },
   { path: 'about', component: ListComponent, data: { type: 'about' } },
   { path: 'themes', component: ListComponent, data: { type: 'themes' } },
+  { path: 'wifi', component: ListComponent, data: { type: 'wifi' } },
   { path: 'artists', component: ListComponent, data: { type: 'artists' } },
   { path: 'artists/:id/albums', component: ListComponent, data: { type: 'albums' } },
   { path: 'albums/:id/tracks', component: ListComponent, data: { type: 'tracks' }  },

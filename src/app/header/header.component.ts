@@ -10,8 +10,13 @@ import { AudioService } from '../services/audio.service';
 export class HeaderComponent implements OnInit {
    
   statusLogo : string = "";
+  now : string = new Date().toLocaleTimeString();
 
-  constructor(private audioService: AudioService) {}
+  constructor(private audioService: AudioService) {
+       setInterval(() => {
+          this.now = new Date().toLocaleTimeString();
+        }, 60000);
+  }
 
   ngOnInit(): void {
     this.audioService.getPlayerStatus().subscribe(status => {

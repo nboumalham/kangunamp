@@ -4,11 +4,12 @@ import {ListItem} from './list-item.model';
 import { Location } from '@angular/common'
 import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
 
-import { ListConfig, homeViewConfig, settingsViewConfig, artistsViewConfig, albumsViewConfig, tracksViewConfig, themesViewConfig, aboutViewConfig } from './list-configurations';
+import { ListConfig, homeViewConfig, settingsViewConfig, artistsViewConfig, albumsViewConfig, tracksViewConfig, themesViewConfig, aboutViewConfig, wifiViewConfig } from './list-configurations';
 
 import { SharedService } from '../services/shared.service';
 import { AudioService } from '../services/audio.service';
 import { JellyfinService } from '../services/jellyfin.service';
+import { WifiService } from '../services/wifi.service';
 
 @Component({
   templateUrl: './list.component.html',
@@ -26,6 +27,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
               protected sharedService: SharedService,
               protected audioService: AudioService,
               protected jellyfinService : JellyfinService,
+              protected wifiService : WifiService,
               protected route: ActivatedRoute,
               protected location: Location) {
     super();
@@ -46,6 +48,8 @@ export class ListComponent extends KeyboardHelper implements OnInit {
         return aboutViewConfig();
       case 'themes':
         return themesViewConfig();
+      case 'wifi':
+        return wifiViewConfig(this.router, this.wifiService);
       case 'artists':
         return artistsViewConfig(this.router, this.audioService, this.jellyfinService);
       case 'albums':

@@ -3,6 +3,7 @@ import { ListItem, TrackItem } from './list-item.model';
 
 import { AudioService } from '../services/audio.service';
 import { JellyfinService } from '../services/jellyfin.service';
+import { WifiService, WifiNetwork } from '../services/wifi.service';
 
 export interface ListConfig {
   fetchList: (selectedIndex?: number, parentId?: string) => Promise<ListItem[]>;
@@ -40,6 +41,7 @@ export const settingsViewConfig = (router: Router): ListConfig => ({
     const items: ListItem[] = [];
     items.push(new ListItem("0", "About", "", 0 === selectedIndex, true));
     items.push(new ListItem("1", "Themes", "Light", 1 === selectedIndex, true));
+    items.push(new ListItem("2", "Wifi", "Connected", 2 === selectedIndex, true));
     return items;
   },
 
@@ -48,6 +50,8 @@ export const settingsViewConfig = (router: Router): ListConfig => ({
       router.navigate(['about']);
     } else if (item.title === "Themes") {
       router.navigate(['themes']);
+    } else if (item.title === "Wifi") {
+      router.navigate(['wifi']);
     }
   },
 });
@@ -149,5 +153,29 @@ export const tracksViewConfig = (router: Router, audioService: AudioService, jel
     audioService.setAudio(jellyfinService.getTrackStream(item.id));
     audioService.setAlbumImageUrl(jellyfinService.getTrackImageURL(item.id));
     router.navigate(['player']);
+  },
+});
+
+
+
+export const wifiViewConfig = (router: Router, wifiService : WifiService): ListConfig => ({
+  fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
+    const items: ListItem[] = [];
+    wifiService.scanNetworks().subscribe(
+      (result) => {
+
+        result.networks.forEach((network: WifiNetwork, index: number) => {
+          items.push(new ListItem('' + index, network.ssid, network.mode, index === 0, false));
+        });
+      },
+      (error) => {
+        console.log(error);
+      },
+    );
+    return items;
+  },
+
+  onSelectItem: (item: ListItem): void => {
+    
   },
 });
