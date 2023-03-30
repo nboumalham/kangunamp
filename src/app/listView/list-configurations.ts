@@ -11,7 +11,7 @@ export interface ListConfig {
 }
 
 export const homeViewConfig = (router: Router, audioService: AudioService): ListConfig => ({
-  title: "Home",
+  title: "Kangunamp",
 
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [
@@ -20,8 +20,8 @@ export const homeViewConfig = (router: Router, audioService: AudioService): List
     ];
 
     audioService.getPlayerStatus().subscribe((status) => {
-      if (status === "playing" || status === "paused") {
-        items.push(new ListItem("2", "Now Playing", "", 2 === selectedIndex,));
+      if ((status !== "stopped") && (items.findIndex(item => item.title === "Now Playing") === -1)) {
+          items.push(new ListItem("2", "Now Playing", "", 2 === selectedIndex,));
       }
     });
     return items;
@@ -73,7 +73,7 @@ export const aboutViewConfig = (): ListConfig => ({
 
 });
 export const themesViewConfig = (): ListConfig => ({
-  title: "About",
+  title: "Themes",
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [];
     items.push(new ListItem("0", "Light", "",true));

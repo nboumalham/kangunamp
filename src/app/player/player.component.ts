@@ -31,7 +31,7 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     protected audioService: AudioService,
     protected sharedService : SharedService,
     protected location: Location
-  ) {
+    ) {
     super();
   }
 
@@ -60,6 +60,10 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
 
     this.audioService.getPlaylistIndex().subscribe(playlistIndex => {
       this.playlistIndex = playlistIndex;
+      if (this.playlistIndex != "1 of 1") {
+        this.left_button_label = "Prev";
+        this.right_button_label = "Next";
+      }
     });
 
     this.audioService.getPlayerStatus().subscribe(status => {
@@ -74,8 +78,13 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     });
   }
 
-  handleSoftLeftButton() {}
-  handleSoftRightButton() {}
+  handleSoftLeftButton() {
+    this.audioService.playPreviousAudio();
+  }
+  handleSoftRightButton() {
+    this.audioService.playNextAudio();
+
+  }
   handleCenterButton() {
     this.audioService.toggleAudio();
   }

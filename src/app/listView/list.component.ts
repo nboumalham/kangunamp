@@ -23,15 +23,15 @@ export class ListComponent extends KeyboardHelper implements OnInit {
   public config! : ListConfig;
 
   constructor(protected router: Router,
-              protected sharedService: SharedService,
-              protected audioService: AudioService,
-              protected jellyfinService : JellyfinService,
-              protected route: ActivatedRoute,
-              protected location: Location) {
+    protected sharedService: SharedService,
+    protected audioService: AudioService,
+    protected jellyfinService : JellyfinService,
+    protected route: ActivatedRoute,
+    protected location: Location) {
     super();
     this.left_button_label = "Player";
     this.route.data.subscribe((data) => {
-    this.config = this.getConfig(data['type']);
+      this.config = this.getConfig(data['type']);
       // ... other actions based on config
     });
   }
@@ -39,21 +39,21 @@ export class ListComponent extends KeyboardHelper implements OnInit {
   getConfig(type: string): ListConfig {
     switch (type) {
       case 'home':
-        return homeViewConfig(this.router, this.audioService);
+      return homeViewConfig(this.router, this.audioService);
       case 'settings':
-        return settingsViewConfig(this.router);
+      return settingsViewConfig(this.router);
       case 'about':
-        return aboutViewConfig();
+      return aboutViewConfig();
       case 'themes':
-        return themesViewConfig();
+      return themesViewConfig();
       case 'artists':
-        return artistsViewConfig(this.router, this.audioService, this.jellyfinService);
+      return artistsViewConfig(this.router, this.audioService, this.jellyfinService);
       case 'albums':
-        return albumsViewConfig(this.router, this.audioService, this.jellyfinService);
+      return albumsViewConfig(this.router, this.audioService, this.jellyfinService);
       case 'tracks':
-        return tracksViewConfig(this.router, this.audioService, this.jellyfinService);
+      return tracksViewConfig(this.router, this.audioService, this.jellyfinService);
       default:
-        throw new Error('Invalid configuration type');
+      throw new Error('Invalid configuration type');
     }
   }
 

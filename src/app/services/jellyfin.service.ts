@@ -118,8 +118,12 @@ getBaseHttpParams() {
     return params;
 }
 
+/*****************************************************************************/
+/*  AUTHENTICATION
+/*****************************************************************************/
 
 
+//REGULAR USERNAME PASSWORD AUTH (not used in this app but I want to keep it)
 authenticate(username : string, password : string ) : Observable<any> {
     const url = this.baseURL + '/Users/authenticatebyname';
     const body = { Username: username,
@@ -128,6 +132,25 @@ authenticate(username : string, password : string ) : Observable<any> {
     return this.http.post(url, body, {headers: this.headers});
 }
 
+// QUICK CONNECT
+initiateQuickConnect(): Observable<any> {
+  const url = this.baseURL + '/QuickConnect/Initiate';
+  return this.http.get(url, { headers: this.getHeaders() });
+}
+
+checkQuickConnectStatus(secret: string): Observable<any> {
+  const url = this.baseURL + '/QuickConnect/Connect';
+  const params = new HttpParams().set('secret', secret);
+  return this.http.get(url, { params, headers: this.getHeaders() });
+}
+
+authenticateWithQuickConnect(secret: string): Observable<any> {
+  const url = this.baseURL + '/Users/AuthenticateWithQuickConnect';
+  const body = { Secret: secret };
+  return this.http.post(url, body, { headers: this.getHeaders() });
+}
+
+//Checks if token is still valid
 checkAuth(accessToken : string, userId: string) {
      const url = this.baseURL + `/Users/${userId}`;
      const headersWithtoken = this.headers.set('X-MediaBrowser-Token', `${accessToken}`);
@@ -143,6 +166,7 @@ checkAuth(accessToken : string, userId: string) {
       }
     );
   }
+
 
 
 

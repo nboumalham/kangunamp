@@ -126,7 +126,7 @@ export class AudioService {
         this.setPlaylistIndex(this.currentAudioIndex);
     }
 
-    // Add new methods to navigate the audio queue
+    //methods to navigate the audio queue
     public playNextAudio(): void {
         if (this.currentAudioIndex + 1 < this.audioQueue.length) {
             this.currentAudioIndex++;

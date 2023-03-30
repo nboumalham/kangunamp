@@ -1,13 +1,7 @@
-    <h2>Login to Jellyfin</h2>
-    <form (ngSubmit)="onSubmit()">
-      <div>
-        <label for="username">Username:</label>
-        <input id="username" type="text" [(ngModel)]="username" name="username">
-      </div>
-      <div>
-        <label for="password">Password:</label>
-        <input id="password" type="password" [(ngModel)]="password" name="password">
-      </div>
-      <button type="submit">Login</button>
-    </form>
-    <div *ngIf="errorMessage" style="color: red">{{ errorMessage }}</div>
+<div id = "auth">
+  <div *ngIf="errorMessage" style="color: red">{{ errorMessage }}</div>
+  <div *ngIf="quickConnectCode">
+    Quick Connect Code:
+    <div class="code">{{ quickConnectCode }}</div>
+  </div>
+</div>
