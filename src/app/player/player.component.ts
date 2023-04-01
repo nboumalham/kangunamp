@@ -1,5 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { trigger, state, style, animate, transition } from '@angular/animations';
+import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common'
 
 import { JellyfinService } from '../services/jellyfin.service';
@@ -24,13 +23,15 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   trackName : string = "";
   artistName : string = "";
   imageUrl : string = "";
+  defaultImageUrl : string = "../../assets/images/album.png";
   playlistIndex = "";
+  
 
   constructor(
     private jellyfinService: JellyfinService,
     protected audioService: AudioService,
     protected sharedService : SharedService,
-    protected location: Location
+    protected location: Location,
     ) {
     super();
   }
@@ -57,6 +58,7 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     this.audioService.getAlbumImageUrl().subscribe(imageUrl => {
       this.imageUrl = imageUrl;
     });
+    
 
     this.audioService.getPlaylistIndex().subscribe(playlistIndex => {
       this.playlistIndex = playlistIndex;
@@ -93,4 +95,10 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   handleBackButton() {
     this.location.back();
   }
+ 
+  onImageError() {
+    this.imageUrl = this.defaultImageUrl;
+  }
+  
+  
 }

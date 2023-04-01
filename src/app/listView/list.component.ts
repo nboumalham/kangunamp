@@ -2,7 +2,7 @@ import {Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import {KeyboardHelper} from '../helpers/keyboard.helper'
 import {ListItem} from './list-item.model';
 import { Location } from '@angular/common'
-import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { ListConfig, homeViewConfig, settingsViewConfig, artistsViewConfig, albumsViewConfig, tracksViewConfig, themesViewConfig, aboutViewConfig } from './list-configurations';
 
@@ -21,6 +21,10 @@ export class ListComponent extends KeyboardHelper implements OnInit {
   public itemList : ListItem[] = [];
   public index = 0;
   public config! : ListConfig;
+
+  //handling UI sounds
+  clickSoundPath = "../../assets/sounds/click.mp3";
+  debounceTimeout : any;
 
   constructor(protected router: Router,
     protected sharedService: SharedService,
@@ -61,6 +65,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
   ngOnInit(): void {
     const parentId = this.route.snapshot.paramMap.get('id');
     this.index = this.sharedService.getCurrentIndex();
+    this.itemList.push(new ListItem("0", "Loading...","", true));
     this.config.fetchList(this.index, parentId ? parentId : undefined ).then((fetchedList) => {
       this.itemList = fetchedList;
       this.scrollToSelected();
@@ -73,6 +78,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
   };
 
   handleDownButton() {
+    this.playClickSound();
     // Your row selection code
     this.itemList[this.index].selected = false;
     if (this.index+1 < this.itemList.length) {
@@ -84,7 +90,28 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     this.scrollToSelected();
   }
 
+  lastPlayTime = 0;
+
+  playClickSound() {
+    const currentTime = new Date().getTime();
+    const timeSinceLastPlay = currentTime - this.lastPlayTime;
+  
+    const audio = new Audio(this.clickSoundPath);
+  
+    if (timeSinceLastPlay < 100) { // 200 milliseconds threshold, adjust as needed
+      audio.volume = 0.2; // Lower volume (adjust as needed)
+    } else {
+      audio.volume = 0.4; // Full volume
+    }
+  
+    this.lastPlayTime = currentTime;
+    audio.play();
+  }
+  
+  
+
   handleUpButton() {
+    this.playClickSound();
     // Your row selection code
     this.itemList[this.index].selected = false;
 
@@ -138,7 +165,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     const containerHeight = containerElement.offsetHeight;
     const containerScrollTop = containerElement.scrollTop;
     const containerScrollBottom = containerScrollTop + containerHeight;
-    const selectedItemTop = selectedItemElement.offsetTop - itemHeight; //the 30 is the height of the header
+    const selectedItemTop = selectedItemElement.offsetTop - itemHeight; //- itemHeight is supposed to subtract the height of the header. So always make sure the header is equal in height to the item
     const selectedItemBottom = selectedItemTop + itemHeight;
 
     if (selectedItemTop < containerScrollTop) {
