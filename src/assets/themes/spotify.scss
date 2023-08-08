@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'iPod';
-  src: url('../ChicagoFLF.ttf');
+  src: url('../OfficeCodePro-Light.otf');
 }
-
-$background-color: #222222;
-$highlight-color : #2196F3;
-$primary-text-color: #EEEEEE;
-$primary-selected-text-color: #FFFFFF;
+$background-color: #121212;
+$highlight-color : transparent;
+$primary-text-color: #FFFFFF;
+$primary-selected-text-color: #1ED760;
 $secondary-text-color: #CCCCCC;
+$primary-active-color: #1ED760;

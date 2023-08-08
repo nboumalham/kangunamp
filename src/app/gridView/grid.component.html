@@ -1,14 +1,16 @@
-<ul class="list-container" #container>
-	<li *ngFor="let item of itemList" class="list-item" [class.selected]="item.selected">
-		<p class="name">{{item.title}}</p>
-      	<ng-container *ngIf="item.subtitle.length > 0">
-      		<p class="description">{{item.subtitle}}</p>
-      	</ng-container>
-		<ng-container *ngIf="item.hasChild">
-			<p class="icon">›</p>
-  		</ng-container>
-  </li>
-</ul>
+<div class="grid-container" [ngStyle]="{'grid-template-columns': getColumnTemplate()}" (window:resize)="onResize($event)" #container>
+  <div *ngFor="let item of itemList" class="grid-item" [ngStyle]="{'width': getColumnWidth()}" [class.selected]="item.selected" (click)="selectItem(item)">
+    <div class="card">
+      <div class="image">
+        <img src="" [src]="getArtistImage(item.id)"/>
+      </div>
+      <p class="name">{{ item.title }}</p>
+      <p class="description">{{ item.subtitle }}</p>
+      <!-- Add other card content here as needed -->
+    </div>
+  </div>
+</div>
+
  <div class="footer-controls">
     <span class="footer-button">{{left_button_label}}</span>
     <span class="footer-button">{{middle_button_label}}</span>

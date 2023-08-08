@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'iPod';
-  src: url('../matrix.ttf'); 
+  src: url('../matrix.ttf');
 }
 
 $background-color: #333333;
@@ -8,4 +8,4 @@ $highlight-color : #1DB954;
 $primary-text-color: #EEEEEE;
 $primary-selected-text-color: #FFFFFF;
 $secondary-text-color: #CCCCCC;
-
+$primary-active-color : $highlight-color

@@ -1,7 +1,7 @@
 @import '../../assets/themes/default.scss';
 
 	ul.list-container {
-        height: calc(80vh);
+        height: calc(90vh);
         width: 100vw;
         overflow-y: scroll;
         overflow-x: hidden;
@@ -10,8 +10,8 @@
 
 	li.list-item {
 
-		$list-item-height: 10vh;
-		$list-item-font-size: 5vh;
+		$list-item-height: 8vh;
+		$list-item-font-size: 4vh;
 		text-align: left;
 		font-size: $list-item-font-size;
 		width: 100%;
@@ -47,7 +47,7 @@
 			margin: auto;
 			margin-right : 10px;
 			&:nth-child(3) {
-				margin-left: 0px;	
+				margin-left: 0px;
 			}
 		}
 	}

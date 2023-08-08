@@ -6,12 +6,12 @@ div.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 9.5vh;
+    height: 5vh;
 
     span.item {
       border: none;
       outline: none;
-      font-size: 5vh;
+      font-size: 3vh;
       color: $primary-text-color;
       overflow: hidden;
       text-align: center;

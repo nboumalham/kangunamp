@@ -6,12 +6,13 @@ import { TrackItem } from '../listView/list-item.model';
 export class AudioService {
 
     public audio: HTMLAudioElement;
-    
+
+    public trackId : BehaviorSubject<string> = new BehaviorSubject('Unknown');
     public trackName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
     public artistName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
     public albumName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
     public albumImageUrl : BehaviorSubject<string> = new BehaviorSubject('https://cdn.iconscout.com/icon/premium/png-512-thumb/question-mark-4397530-3644875.png?f=avif&w=256');
-    
+
     public playlistIndex : BehaviorSubject<string> = new BehaviorSubject('0 of 0');
 
     public timeElapsed: BehaviorSubject<string> = new BehaviorSubject('00:00');
@@ -120,6 +121,7 @@ export class AudioService {
 
         const track = this.audioQueue[this.currentAudioIndex];
         this.setAudio(track.audioUrl);
+        this.setTrackId(track.id);
         this.setTrackName(track.title);
         this.setArtistName(track.artistName);
         this.setAlbumImageUrl(track.trackImageURL);
@@ -156,7 +158,7 @@ export class AudioService {
 
     /**
      * This is typically a URL to an MP3 file
-     * @param src 
+     * @param src
      */
      public setAudio(src: string): void {
          this.audio.src = src;
@@ -178,8 +180,8 @@ export class AudioService {
      }
 
     /**
-     * Method to seek to a position on the audio track (in milliseconds, I think), 
-     * @param position 
+     * Method to seek to a position on the audio track (in milliseconds, I think),
+     * @param position
      */
      public seekAudio(position: number): void {
          this.audio.currentTime = position;
@@ -188,7 +190,7 @@ export class AudioService {
     /**
      * This formats the audio's elapsed time into a human readable format, could be refactored into a Pipe.
      * It takes the audio track's "currentTime" property as an argument. It is called from the, calulateTime method.
-     * @param ct 
+     * @param ct
      */
      private setTimeElapsed(ct: number): void {
          let seconds     = Math.floor(ct % 60),
@@ -202,8 +204,8 @@ export class AudioService {
     /**
      * This method takes the track's "duration" and "currentTime" properties to calculate the remaing time the track has
      * left to play. It is called from the calculateTime method.
-     * @param d 
-     * @param t 
+     * @param d
+     * @param t
      */
      private setTimeRemaining(d: number, t: number): void {
          let remaining;
@@ -226,8 +228,8 @@ export class AudioService {
     /**
      * This method takes the track's "duration" and "currentTime" properties to calculate the percent of time elapsed.
      * This is valuable for setting the position of a range input. It is called from the calculateTime method.
-     * @param d 
-     * @param ct 
+     * @param d
+     * @param ct
      */
      private setPercentElapsed(d: number, ct: number): void {
          this.percentElapsed.next(( Math.floor(( 100 / d ) * ct )) || 0 );
@@ -236,7 +238,7 @@ export class AudioService {
     /**
      * This method takes the track's "duration" and "currentTime" properties to calculate the percent of time elapsed.
      * This is valuable for setting the position of a range input. It is called from the calculatePercentLoaded method.
-     * @param p 
+     * @param p
      */
      private setPercentLoaded(p : any): void {
          this.percentLoaded.next(parseInt(p, 10) || 0 );
@@ -276,7 +278,7 @@ export class AudioService {
      *   - Show pause button when player status is 'playing'
      *   - Show play button when player status is 'paused'
      *   - Show loading indicator when player status is 'loading'
-     * 
+     *
      * See the setPlayer method for values.
      */
      public getPlayerStatus(): Observable<string> {
@@ -290,6 +292,13 @@ export class AudioService {
          (this.audio.paused) ? this.audio.play() : this.audio.pause();
      }
 
+  public getTrackId(): Observable<string> {
+    return this.trackId.asObservable();
+  }
+
+  public setTrackId(id : string) {
+    this.trackId.next(id);
+  }
 
      public setTrackName(name : string) {
          this.trackName.next(name);

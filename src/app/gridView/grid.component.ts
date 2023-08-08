@@ -1,30 +1,29 @@
 import {Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import {KeyboardHelper} from '../helpers/keyboard.helper'
-import {ListItem} from './list-item.model';
+import {ListItem} from '../listView/list-item.model';
 import { Location } from '@angular/common'
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { ListConfig, homeViewConfig, settingsViewConfig, artistsViewConfig, albumsViewConfig, tracksViewConfig, themesViewConfig, aboutViewConfig } from './list-configurations';
+import { ListConfig, homeViewConfig, settingsViewConfig, artistsViewConfig, albumsViewConfig, tracksViewConfig, themesViewConfig, aboutViewConfig } from '../listView/list-configurations';
 
 import { SharedService } from '../services/shared.service';
 import { AudioService } from '../services/audio.service';
 import { JellyfinService } from '../services/jellyfin.service';
 
 @Component({
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.scss', '../../assets/themes/default.scss'],
-  providers: [{ provide: KeyboardHelper, useExisting: ListComponent }]
+  templateUrl: './grid.component.html',
+  styleUrls: ['./grid.component.scss', '../../assets/themes/default.scss'],
+  providers: [{ provide: KeyboardHelper, useExisting: GridComponent }]
 })
-export class ListComponent extends KeyboardHelper implements OnInit {
+export class GridComponent extends KeyboardHelper implements OnInit {
 
   @ViewChild('container') container!: ElementRef;
   public itemList : ListItem[] = [];
   public index = 0;
   public config! : ListConfig;
 
-  //handling UI sounds
-  clickSoundPath = "../../assets/sounds/click.mp3";
-  debounceTimeout : any;
+  //Grid variables to set how many items are on a line and how wide they are
+  public breakpoint : number = 0;
 
   constructor(protected router: Router,
     protected sharedService: SharedService,
@@ -61,7 +60,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     }
   }
 
-  
+
   ngOnInit(): void {
     const parentId = this.route.snapshot.paramMap.get('id');
     this.index = this.sharedService.getCurrentIndex();
@@ -70,14 +69,43 @@ export class ListComponent extends KeyboardHelper implements OnInit {
       this.itemList = fetchedList;
       this.scrollToSelected();
     });
+    this.calculateGrid();
     this.sharedService.setTitle(this.config.title);
   }
-  
+
+  onResize(event: Event) {
+    this.calculateGrid();
+  }
+
+  calculateGrid() {
+    let size = 0;
+    const width = window.innerWidth + 1;
+    const height = window.innerHeight + 1;
+    const ratio = width/height;
+    this.breakpoint = Math.ceil(3*ratio) - 1;
+    this.sharedService.setTitle("" + ratio);
+  }
   selectItem(item : ListItem) {
     this.config.onSelectItem(item, this.itemList);
   };
 
-  handleDownButton() {
+
+  handleLeftButton(): void {
+    this.playClickSound();
+    // Your row selection code
+    this.itemList[this.index].selected = false;
+
+    if (this.index == 0) {
+      this.index = this.itemList.length-1
+    } else {
+      this.index--;
+    }
+    this.itemList[this.index].selected = true;
+    this.scrollToSelected();
+  }
+
+  handleRightButton(): void {
+
     this.playClickSound();
     // Your row selection code
     this.itemList[this.index].selected = false;
@@ -88,27 +116,20 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     }
     this.itemList[this.index].selected = true;
     this.scrollToSelected();
-  }
 
-  lastPlayTime = 0;
-
-  playClickSound() {
-    const currentTime = new Date().getTime();
-    const timeSinceLastPlay = currentTime - this.lastPlayTime;
-  
-    const audio = new Audio(this.clickSoundPath);
-  
-    if (timeSinceLastPlay < 100) { // 200 milliseconds threshold, adjust as needed
-      audio.volume = 0.2; // Lower volume (adjust as needed)
-    } else {
-      audio.volume = 0.4; // Full volume
-    }
-  
-    this.lastPlayTime = currentTime;
-    audio.play();
   }
-  
-  
+  handleDownButton() {
+    this.playClickSound();
+    // Your row selection code
+    this.itemList[this.index].selected = false;
+    if (this.index + this.breakpoint < this.itemList.length) {
+      this.index = this.index + this.breakpoint;
+    } else if (this.index == this.breakpoint) {
+      this.index = 0;
+    } else this.index = this.itemList.length - 1
+    this.itemList[this.index].selected = true;
+    this.scrollToSelected();
+  }
 
   handleUpButton() {
     this.playClickSound();
@@ -117,8 +138,11 @@ export class ListComponent extends KeyboardHelper implements OnInit {
 
     if (this.index == 0) {
       this.index = this.itemList.length-1
-    } else {
-      this.index--;
+    } else if (this.index - this.breakpoint < 0) {
+      this.index = 0;
+    }
+    else {
+      this.index = this.index - this.breakpoint;
     }
     this.itemList[this.index].selected = true;
     this.scrollToSelected();
@@ -144,6 +168,9 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     }
   }
 
+  getArtistImage(id : string) : string {
+    return this.jellyfinService.getItemImageURL(id);
+  }
   scrollToSelected(attempts = 5, delay = 50): void {
     if (attempts <= 0) {
       console.warn('Failed to scroll to selected item after maximum attempts');
@@ -151,7 +178,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     }
 
     const containerElement = this.container.nativeElement;
-    const itemElements = containerElement.querySelectorAll('.list-item');
+    const itemElements = containerElement.querySelectorAll('.grid-item');
     const selectedItemElement = itemElements[this.index];
 
     if (!selectedItemElement) {
@@ -165,14 +192,30 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     const containerHeight = containerElement.offsetHeight;
     const containerScrollTop = containerElement.scrollTop;
     const containerScrollBottom = containerScrollTop + containerHeight;
-    const selectedItemTop = selectedItemElement.offsetTop - itemHeight; //- itemHeight is supposed to subtract the height of the header. So always make sure the header is equal in height to the item
+    const selectedItemTop = selectedItemElement.offsetTop;
     const selectedItemBottom = selectedItemTop + itemHeight;
+    const centerOffset = containerHeight / 2 - itemHeight / 2;
 
-    if (selectedItemTop < containerScrollTop) {
-      containerElement.scrollTop = selectedItemTop;
-    } else if (selectedItemBottom > containerScrollBottom) {
-      containerElement.scrollTop = selectedItemBottom - containerHeight;
+    if (selectedItemTop < containerScrollTop + centerOffset) {
+      // Scroll to the top of the selected item centered on the screen
+      containerElement.scrollTop = selectedItemTop - centerOffset;
+    } else if (selectedItemBottom > containerScrollBottom - centerOffset) {
+      // Scroll to the bottom of the selected item centered on the screen
+      containerElement.scrollTop = selectedItemBottom - containerHeight + centerOffset;
     }
+  }
+
+
+
+
+  getColumnTemplate(): string {
+    // Calculate the column template based on the number of columns
+    return `repeat(${this.breakpoint}, 1fr)`;
+  }
+
+  getColumnWidth(): string {
+    // Calculate the column template based on the number of columns
+    return `${window.innerWidth/this.breakpoint}px`;
   }
 
 }

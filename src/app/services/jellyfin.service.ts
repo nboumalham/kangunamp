@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
+import {PlaybackProgressInfo} from "./playback-progress-info";
 
 @Injectable({
   providedIn: 'root'
@@ -24,17 +25,17 @@ export class JellyfinService {
   }
 
   baseURL = "https://media.boumalham.com/";
-  
-  client = "kaiOs";
-  device = 'kaiOS';
-  deviceId = "dslkfsdlkjfsdkfljsdlfkj";
+
+  client = "Kangunamp";
+  device = 'Kangunamp';
+  deviceId = "TW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0OyBydjo5NC4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzk0LjB8MTYzODA1MzA2OTY4Mw12";
   version = "0.0.0.1";
 
   headers = new HttpHeaders({
     'Content-Type': 'application/json',
     'X-MediaBrowser-Token': '',
     'X-Emby-Authorization': `MediaBrowser Client="${this.client}", Device="${this.device}", DeviceId="${this.deviceId}", Version="${this.version}"`,
-    'MediaBrowser': 'Web',
+    'MediaBrowser': 'Music',
     'Client': this.client,
     'Device': this.device,
     'DeviceId': this.deviceId,
@@ -66,14 +67,15 @@ getHeaders() : HttpHeaders {
     }
   }
 
-listAlbums(artistId: string): Observable<any> {
-    const cacheKey = `albums_${artistId}`;
+listAlbums(artistId?: string): Observable<any> {
+    const key = artistId = (artistId ? artistId : "all");
+    const cacheKey = `albums_${key}`;
     const cachedData = this.getDataFromLocalStorage(cacheKey);
 
     if (cachedData) {
       return of(cachedData);
     } else {
-      const url = this.baseURL + "Items/?ArtistIds=" + artistId + "&Recursive=true&IncludeItemTypes=MusicAlbum";
+      const url = this.baseURL + "Items/?" + (artistId ? "ArtistIds=" + artistId + "&" : "") + "Recursive=true&IncludeItemTypes=MusicAlbum";
       return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
         tap(data => {
           this.setDataToLocalStorage(cacheKey, data);
@@ -98,12 +100,12 @@ listAlbums(artistId: string): Observable<any> {
     }
   }
 
-getTrackImageURL(trackId : string) : string {
-  return this.baseURL + "/Items/" + trackId + "/Images/Primary?fillWidth=200&fillHeight=200&quality=90"
+getItemImageURL(itemId : string, hd: boolean = false, type : string = "Primary") : string {
+  return this.baseURL + "/Items/" + itemId + "/Images/" + type + (hd ? "" : "?fillWidth=200&fillHeight=200&quality=90");
 }
 
 getTrackStream(trackId : string) :string {
-	const url = this.baseURL + `Audio/${trackId}/universal/`;
+	const url = this.baseURL + `Audio/${trackId}/stream`;
 	const params = new HttpParams({ fromObject: this.getBaseHttpParams() });
   return url + '?' + params.toString();
 }
@@ -167,7 +169,64 @@ checkAuth(accessToken : string, userId: string) {
     );
   }
 
+/** SESSION MANAGEMENT **/
 
+startSessionPlayback(itemId: string, isPaused : boolean = false): void {
+    //const cacheKey = `items_${albumId}`;
+    //const cachedData = this.getDataFromLocalStorage(cacheKey);
+  console.log("fucker");
+  const url = this.baseURL + "/Sessions/Playing";
+  const progressInfo: PlaybackProgressInfo = new PlaybackProgressInfo({
+    canSeek: true,
+    itemId: itemId,
+    isPaused: isPaused,
+    isMuted: false,
+    // Set other properties as needed
+  });
+  this.http.post(url,  progressInfo, {headers: this.getHeaders()}).subscribe(
+    (response) => {
+      // Handle successful response if needed
+      console.log('Playback started:', response);
+    },
+    (error) => {
+      // Handle error if needed
+      console.error('Error starting playback:', error);
+    }
+  );
+  }
+
+  getSessionPlayback(itemId: string): Observable<any> {
+    //const cacheKey = `items_${albumId}`;
+    //const cachedData = this.getDataFromLocalStorage(cacheKey);
+    const url = this.baseURL + "/Sessions/Playing/Progress";
+    return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
+      tap(data => {
+      })
+    );
+  }
+
+  stopSessionPlayback(itemId: string): void {
+    //const cacheKey = `items_${albumId}`;
+    //const cachedData = this.getDataFromLocalStorage(cacheKey);
+    const url = this.baseURL + "/Sessions/Playing/Stopped";
+    const progressInfo: PlaybackProgressInfo = new PlaybackProgressInfo({
+      canSeek: true,
+      itemId: itemId,
+      isPaused: false,
+      isMuted: false,
+      // Set other properties as needed
+    });
+    this.http.post(url,  progressInfo, {headers: this.getHeaders()}).subscribe(
+      (response) => {
+        // Handle successful response if needed
+        console.log('Playback started:', response);
+      },
+      (error) => {
+        // Handle error if needed
+        console.error('Error starting playback:', error);
+      }
+    );
+  }
 
 
 

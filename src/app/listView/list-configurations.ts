@@ -15,21 +15,24 @@ export const homeViewConfig = (router: Router, audioService: AudioService): List
 
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [
-      new ListItem("0", "Music", "", 0 === selectedIndex, true),
-      new ListItem("1", "Settings", "", 1 === selectedIndex, true),
+      new ListItem("0", "Artists", "", 0 === selectedIndex, true),
+      new ListItem("1", "Albums", "", 1 === selectedIndex, true),
+      new ListItem("2", "Settings", "", 2 === selectedIndex, true),
     ];
 
     audioService.getPlayerStatus().subscribe((status) => {
       if ((status !== "stopped") && (items.findIndex(item => item.title === "Now Playing") === -1)) {
-          items.push(new ListItem("2", "Now Playing", "", 2 === selectedIndex,));
+          items.push(new ListItem("3", "Now Playing", "", 2 === selectedIndex,));
       }
     });
     return items;
   },
 
   onSelectItem: (item: ListItem): void => {
-    if (item.title === "Music") {
+    if (item.title === "Artists") {
       router.navigate(['artists']);
+    } else if (item.title === "Albums") {
+      router.navigate(['albums']);
     } else if (item.title === "Settings") {
       router.navigate(['settings']);
     } else if (item.title === "Now Playing") {
@@ -60,7 +63,7 @@ export const aboutViewConfig = (): ListConfig => ({
   title: "About",
   fetchList: async (selectedIndex?: number): Promise<ListItem[]> => {
     const items: ListItem[] = [];
-    items.push(new ListItem("0", "Device", "iPod Classic", true));
+    items.push(new ListItem("0", "Device", "Kangunamp", true));
     items.push(new ListItem("1", "Copyright", "© 2023 NBM", false));
     items.push(new ListItem("2", "OS version", "0.0.0.1", false));
     items.push(new ListItem("3", "User id", `${localStorage.getItem('jellyfin_user_id')}`, false));
@@ -113,7 +116,7 @@ export const albumsViewConfig = (router: Router, audioService: AudioService, jel
   title: "Albums",
   fetchList: async (selectedIndex?: number, parentId?: string): Promise<ListItem[]> => {
     const items: ListItem[] = [];
-    if (typeof(parentId) === 'string') jellyfinService.listAlbums(parentId)
+    jellyfinService.listAlbums(parentId)
     .subscribe(
       albums => {
         albums.Items.forEach((album : any, index : number) => {
@@ -141,7 +144,7 @@ export const tracksViewConfig = (router: Router, audioService: AudioService, jel
 
     if (typeof parentId === 'string') {
       const tracks = await jellyfinService.listItems(parentId).toPromise();
-      
+
       if (tracks.Items.length > 1) {
         const tracksTotalTime = tracks.Items.reduce((total: number, track : any) => total + track.RunTimeTicks, 0);
         items.push(
@@ -162,7 +165,7 @@ export const tracksViewConfig = (router: Router, audioService: AudioService, jel
           selectedIndex === (tracks.Items.length > 1 ? index + 1 : index),
           track.Artists[0],
           track.Album,
-          jellyfinService.getTrackImageURL(track.Id),
+          jellyfinService.getItemImageURL(track.Id, true),
           jellyfinService.getTrackStream(track.Id)
         );
 
@@ -182,9 +185,9 @@ export const tracksViewConfig = (router: Router, audioService: AudioService, jel
         } else console.error('The list of tracks sent was empty');
       }
       else audioService.setAudioQueue(trackItem);
-      
+
       router.navigate(['player']);
-    
+
     } else {
       console.error('Expected a TrackItem, but received a ListItem.');
     }

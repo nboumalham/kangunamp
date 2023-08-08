@@ -10,6 +10,8 @@ export abstract class KeyboardHelper {
   abstract handleCenterButton() : void;
   abstract handleUpButton() : void;
   abstract handleDownButton() : void;
+  abstract handleLeftButton() : void;
+  abstract handleRightButton() : void;
 
   public left_button_label : string = "";
   public middle_button_label : string = "";
@@ -17,9 +19,9 @@ export abstract class KeyboardHelper {
 
   @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
-  event.preventDefault();
+  //event.preventDefault();
   event.stopPropagation();
-  
+
   switch (event.keyCode) {
     case KEY_CODE.DOWN_ARROW:
       this.handleDownButton();
@@ -27,6 +29,14 @@ export abstract class KeyboardHelper {
 
     case KEY_CODE.UP_ARROW:
       this.handleUpButton();
+      break;
+
+    case KEY_CODE.LEFT_ARROW:
+      this.handleLeftButton();
+      break;
+
+    case KEY_CODE.RIGHT_ARROW:
+      this.handleRightButton();
       break;
 
     case KEY_CODE.ENTER:
@@ -41,9 +51,9 @@ export abstract class KeyboardHelper {
       this.handleSoftRightButton();
       break;
 
-    case KEY_CODE.BACKSPACE:
-      this.handleBackButton();
-      break;
+    case KEY_CODE.BACKSPACE : case KEY_CODE.ESCAPE:
+        this.handleBackButton();
+        break;
 
     default:
       // Handle other key events here
@@ -51,6 +61,27 @@ export abstract class KeyboardHelper {
   }
 }
 
+
+//handling UI sounds
+  clickSoundPath = "../../assets/sounds/click.mp3";
+  debounceTimeout : any;
+  lastPlayTime = 0;
+
+  playClickSound() {
+    const currentTime = new Date().getTime();
+    const timeSinceLastPlay = currentTime - this.lastPlayTime;
+
+    const audio = new Audio(this.clickSoundPath);
+
+    if (timeSinceLastPlay < 100) { // 200 milliseconds threshold, adjust as needed
+      audio.volume = 0.2; // Lower volume (adjust as needed)
+    } else {
+      audio.volume = 0.4; // Full volume
+    }
+
+    this.lastPlayTime = currentTime;
+    audio.play();
+  }
 
 }
 
@@ -63,4 +94,5 @@ export enum KEY_CODE {
     SEVEN = 103,
     NINE = 105,
     BACKSPACE = 8,
+    ESCAPE = 27,
 }

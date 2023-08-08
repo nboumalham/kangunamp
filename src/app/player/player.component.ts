@@ -8,6 +8,7 @@ import { SharedService } from '../services/shared.service';
 
 import { TrackItem } from '../listView/list-item.model';
 import {KeyboardHelper} from '../helpers/keyboard.helper'
+import {combineLatest} from "rxjs";
 
 @Component({
   selector: 'app-player',
@@ -15,17 +16,17 @@ import {KeyboardHelper} from '../helpers/keyboard.helper'
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent extends KeyboardHelper implements OnInit {
-  playingTrack: TrackItem = new TrackItem("0", "Unknown", "Unknown", false);
-  
   timeElapsed : string = "--";
   timeRemaining : string = "--";
   progressBarWidth : string = "0%";
+  trackId : string = "0";
   trackName : string = "";
   artistName : string = "";
-  imageUrl : string = "";
+  albumImageUrl : string = "";
+  backDropImageUrl : string = "";
   defaultImageUrl : string = "../../assets/images/album.png";
   playlistIndex = "";
-  
+
 
   constructor(
     private jellyfinService: JellyfinService,
@@ -39,26 +40,26 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   ngOnInit(): void {
     this.sharedService.setTitle("Now Playing");
 
-    this.audioService.getTimeRemaining().subscribe(timeRemaining => {
-      this.timeRemaining = timeRemaining;
-    });
+    combineLatest([
+      this.audioService.getTimeRemaining(),
+      this.audioService.getTimeElapsed(),
+      this.audioService.getPercentElapsed(),
+      this.audioService.getTrackName(),
+      this.audioService.getTrackId(),
+      this.audioService.getArtistName(),
+      this.audioService.getAlbumImageUrl()
+    ]).subscribe(
+      ([timeRemaining, timeElapsed, percentElapsed, trackName, trackId, artistName, imageUrl]) => {
+        this.timeRemaining = timeRemaining;
+        this.timeElapsed = timeElapsed;
+        this.progressBarWidth = `${percentElapsed}%`;
+        this.trackName = trackName;
+        this.trackId = trackId;
+        this.artistName = artistName;
+        this.albumImageUrl = imageUrl;
+      }
+    );
 
-    this.audioService.getTimeElapsed().subscribe(timeElapsed => {
-      this.timeElapsed = timeElapsed;
-    });
-    this.audioService.getPercentElapsed().subscribe(percentElapsed => {
-      this.progressBarWidth = `${percentElapsed}%`;
-    });
-    this.audioService.getTrackName().subscribe(trackName => {
-      this.trackName = trackName;
-    });
-    this.audioService.getArtistName().subscribe(artistName => {
-      this.artistName = artistName;
-    });
-    this.audioService.getAlbumImageUrl().subscribe(imageUrl => {
-      this.imageUrl = imageUrl;
-    });
-    
 
     this.audioService.getPlaylistIndex().subscribe(playlistIndex => {
       this.playlistIndex = playlistIndex;
@@ -70,14 +71,21 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
 
     this.audioService.getPlayerStatus().subscribe(status => {
       if(status === "playing") {
-        this.middle_button_label = "Pause";  
+        this.middle_button_label = "Pause";
+        this.jellyfinService.startSessionPlayback(this.trackId);
       } else if (status === "paused") {
-        this.middle_button_label = "Play";  
+        this.middle_button_label = "Play";
+        this.jellyfinService.startSessionPlayback(this.trackId, true);
       } else {
         this.middle_button_label = status;
+        this.jellyfinService.stopSessionPlayback(this.trackId);
       }
-      
+
     });
+  }
+
+  getImage(id : string, hd : boolean = false, type: string = "Primary") : string {
+    return this.jellyfinService.getItemImageURL(id,hd,type);
   }
 
   handleSoftLeftButton() {
@@ -95,10 +103,16 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   handleBackButton() {
     this.location.back();
   }
- 
+
   onImageError() {
-    this.imageUrl = this.defaultImageUrl;
+    this.albumImageUrl = this.defaultImageUrl;
   }
-  
-  
+
+  handleLeftButton(): void {
+  }
+
+  handleRightButton(): void {
+  }
+
+
 }

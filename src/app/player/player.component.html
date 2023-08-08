@@ -1,7 +1,7 @@
-<div class="now-playing-container">
+<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.99), rgba(0, 0, 0, 1) 99%),url(' + getImage(trackId, true) + ')'">
   <div class="image-container">
     <div class="album-image">
-      <img [src]="imageUrl" (error)="onImageError()" />
+      <img [src]="albumImageUrl" (error)="onImageError()" />
     </div>
   </div>
   <div class="progress-info-container">

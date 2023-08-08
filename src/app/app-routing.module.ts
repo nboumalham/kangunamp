@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ListComponent } from './listView/list.component';
 import { PlayerComponent } from './player/player.component';
 import { AuthComponent } from './authView/auth.component';
+import {GridComponent} from "./gridView/grid.component";
 //import { SettingsComponent } from './settings/settings.component';
 
 const routes: Routes = [
@@ -10,8 +11,9 @@ const routes: Routes = [
   { path: 'settings', component: ListComponent, data: { type: 'settings' } },
   { path: 'about', component: ListComponent, data: { type: 'about' } },
   { path: 'themes', component: ListComponent, data: { type: 'themes' } },
-  { path: 'artists', component: ListComponent, data: { type: 'artists' } },
-  { path: 'artists/:id/albums', component: ListComponent, data: { type: 'albums' } },
+  { path: 'artists', component: GridComponent, data: { type: 'artists' } },
+  { path: 'artists/:id/albums', component: GridComponent, data: { type: 'albums' } },
+  { path: 'albums', component: GridComponent, data: { type: 'albums' } },
   { path: 'albums/:id/tracks', component: ListComponent, data: { type: 'tracks' }  },
   { path: 'player', component: PlayerComponent },
   { path: 'auth', component: AuthComponent },

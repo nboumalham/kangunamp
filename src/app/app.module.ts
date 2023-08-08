@@ -11,11 +11,13 @@ import { AuthComponent } from './authView/auth.component';
 
 import { AudioService } from './services/audio.service';
 import { HeaderComponent } from './header/header.component';
+import {GridComponent} from "./gridView/grid.component";
 
 @NgModule({
   declarations: [
     AppComponent,
     ListComponent,
+    GridComponent,
     PlayerComponent,
     AuthComponent,
     HeaderComponent

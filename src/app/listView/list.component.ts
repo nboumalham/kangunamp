@@ -22,10 +22,6 @@ export class ListComponent extends KeyboardHelper implements OnInit {
   public index = 0;
   public config! : ListConfig;
 
-  //handling UI sounds
-  clickSoundPath = "../../assets/sounds/click.mp3";
-  debounceTimeout : any;
-
   constructor(protected router: Router,
     protected sharedService: SharedService,
     protected audioService: AudioService,
@@ -61,7 +57,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     }
   }
 
-  
+
   ngOnInit(): void {
     const parentId = this.route.snapshot.paramMap.get('id');
     this.index = this.sharedService.getCurrentIndex();
@@ -72,7 +68,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     });
     this.sharedService.setTitle(this.config.title);
   }
-  
+
   selectItem(item : ListItem) {
     this.config.onSelectItem(item, this.itemList);
   };
@@ -89,26 +85,6 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     this.itemList[this.index].selected = true;
     this.scrollToSelected();
   }
-
-  lastPlayTime = 0;
-
-  playClickSound() {
-    const currentTime = new Date().getTime();
-    const timeSinceLastPlay = currentTime - this.lastPlayTime;
-  
-    const audio = new Audio(this.clickSoundPath);
-  
-    if (timeSinceLastPlay < 100) { // 200 milliseconds threshold, adjust as needed
-      audio.volume = 0.2; // Lower volume (adjust as needed)
-    } else {
-      audio.volume = 0.4; // Full volume
-    }
-  
-    this.lastPlayTime = currentTime;
-    audio.play();
-  }
-  
-  
 
   handleUpButton() {
     this.playClickSound();
@@ -162,7 +138,7 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     }
 
     const itemHeight = selectedItemElement.offsetHeight;
-    const containerHeight = containerElement.offsetHeight;
+    const containerHeight = containerElement.offsetHeight/2;
     const containerScrollTop = containerElement.scrollTop;
     const containerScrollBottom = containerScrollTop + containerHeight;
     const selectedItemTop = selectedItemElement.offsetTop - itemHeight; //- itemHeight is supposed to subtract the height of the header. So always make sure the header is equal in height to the item
@@ -173,6 +149,15 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     } else if (selectedItemBottom > containerScrollBottom) {
       containerElement.scrollTop = selectedItemBottom - containerHeight;
     }
+  }
+
+  getArtistImage(id : string) : string {
+    return this.jellyfinService.getItemImageURL(id);
+  }
+  handleLeftButton(): void {
+  }
+
+  handleRightButton(): void {
   }
 
 }

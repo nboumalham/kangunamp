@@ -1,21 +1,61 @@
 @import '../../assets/themes/default.scss';
+// Import any necessary SCSS files and define variables here
 
 .now-playing-container {
-  --magic-width: calc(min(80vw, 50vh));
+  --magic-width: calc(min(50vw, 80vh));
   --player-font-size: 5vh;
   $horizontal-player-size: calc(120vh);
-  height: calc(80vh);
+  height: calc(90vh);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 0 0;
+  animation: moveBackground 60s infinite linear;
+  @keyframes moveBackground {
+    0% {
+      background-position: 0 0;
+      background-size : 100%
+    }
+
+    25% {
+      /* Adjust these values to change the range and speed of movement */
+      background-position: 50% 75%;
+      background-size : 150%
+
+    }
+
+    50% {
+      /* Adjust these values to change the range and speed of movement */
+      background-position: 100% 100%;
+      background-size : 200%
+
+    }
+
+    75% {
+      /* Adjust these values to change the range and speed of movement */
+      background-position: 75% 50%;
+      background-size : 150%
+
+    }
+
+    100% {
+      /* Adjust these values to change the range and speed of movement */
+      background-position: 0 0;
+      background-size : 100%
+    }
+  }
+
+
   .image-container {
     .album-image {
       width: var(--magic-width);
       height: var(--magic-width);
       margin-top: 4px;
       overflow: hidden;
+      perspective: 800px;
       img {
         width: 100%;
         height: 100%;
@@ -59,12 +99,12 @@
       height: 1vh;
       background-color: #f2f2f2;
       border-radius: 15px;
-    @media screen and (min-width: $horizontal-player-size) {
-      margin: 2vh 0;
-    }
+      @media screen and (min-width: $horizontal-player-size) {
+        margin: 2vh 0;
+      }
       .progress-bar {
         height: 100%;
-        background-color: $highlight-color;
+        background-color: $primary-active-color;
         transition: width 0.1s ease-in-out;
         border-radius: 15px;
       }
