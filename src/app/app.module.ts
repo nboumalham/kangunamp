@@ -20,13 +20,13 @@ import {GridComponent} from "./gridView/grid.component";
     GridComponent,
     PlayerComponent,
     AuthComponent,
-    HeaderComponent
+    HeaderComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
   ],
   providers: [AudioService],
   bootstrap: [AppComponent]

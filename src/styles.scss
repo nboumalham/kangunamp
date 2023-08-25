@@ -28,29 +28,6 @@ body {
 		margin: 0;
 	}
 }
-
-  .footer-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    height: 5vh;
-    position: absolute;
-    bottom: 0;
-    background-color: $background-color;
-
-    .footer-button {
-      background-color: transparent;
-      border: none;
-      outline: none;
-      font-size: 3vh;
-      color: $primary-text-color;
-      margin: 0 10px;
-      cursor: pointer;
-    }
-  }
-
-
   //Icons
 
       i.icon {

@@ -6,7 +6,7 @@ import { AudioService } from '../services/audio.service';
 import { SharedService } from '../services/shared.service';
 
 
-import { TrackItem } from '../listView/list-item.model';
+import {ListItem, TrackItem} from '../listView/list-item.model';
 import {KeyboardHelper} from '../helpers/keyboard.helper'
 import {combineLatest} from "rxjs";
 
@@ -20,12 +20,17 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   timeRemaining : string = "--";
   progressBarWidth : string = "0%";
   trackId : string = "0";
+  parentId : string = "";
   trackName : string = "";
   artistName : string = "";
   albumImageUrl : string = "";
   backDropImageUrl : string = "";
   defaultImageUrl : string = "../../assets/images/album.png";
   playlistIndex = "";
+
+
+  public controlsList : ListItem[] = [];
+  public controlsIndex = 1;
 
 
   constructor(
@@ -39,6 +44,9 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
 
   ngOnInit(): void {
     this.sharedService.setTitle("Now Playing");
+    this.controlsList.push(new ListItem("0", "⏮", "", false, true));
+    this.controlsList.push(new ListItem("1", "⏳︎", "", true, true));
+    this.controlsList.push(new ListItem("2", "⏭", "", false, true));
 
     combineLatest([
       this.audioService.getTimeRemaining(),
@@ -46,10 +54,11 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
       this.audioService.getPercentElapsed(),
       this.audioService.getTrackName(),
       this.audioService.getTrackId(),
+      this.audioService.getParentId(),
       this.audioService.getArtistName(),
       this.audioService.getAlbumImageUrl()
     ]).subscribe(
-      ([timeRemaining, timeElapsed, percentElapsed, trackName, trackId, artistName, imageUrl]) => {
+      ([timeRemaining, timeElapsed, percentElapsed, trackName, trackId, parentId, artistName, imageUrl]) => {
         this.timeRemaining = timeRemaining;
         this.timeElapsed = timeElapsed;
         this.progressBarWidth = `${percentElapsed}%`;
@@ -57,28 +66,38 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
         this.trackId = trackId;
         this.artistName = artistName;
         this.albumImageUrl = imageUrl;
+        this.parentId = parentId;
       }
     );
 
 
     this.audioService.getPlaylistIndex().subscribe(playlistIndex => {
       this.playlistIndex = playlistIndex;
-      if (this.playlistIndex != "1 of 1") {
-        this.left_button_label = "Prev";
-        this.right_button_label = "Next";
+      if (this.playlistIndex == "1 of 1") {
+        this.controlsList.splice(2, 1);
+        this.controlsList.splice(0, 1);
       }
     });
 
     this.audioService.getPlayerStatus().subscribe(status => {
+      let playButton = this.controlsList.find(obj => obj.id === "1");
+      if (playButton) {
       if(status === "playing") {
-        this.middle_button_label = "Pause";
+        playButton.title = "⏸";
         this.jellyfinService.startSessionPlayback(this.trackId);
       } else if (status === "paused") {
-        this.middle_button_label = "Play";
+        playButton.title = "⏵";
         this.jellyfinService.startSessionPlayback(this.trackId, true);
-      } else {
-        this.middle_button_label = status;
+      } else if (status === "stopped") {
+        playButton.title = "⏹";
         this.jellyfinService.stopSessionPlayback(this.trackId);
+      } else if (status === "loading") {
+        playButton.title = "⏳︎";
+        this.jellyfinService.stopSessionPlayback(this.trackId);
+      } else {
+        playButton.title = status;
+        this.jellyfinService.stopSessionPlayback(this.trackId);
+      }
       }
 
     });
@@ -93,10 +112,19 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   }
   handleSoftRightButton() {
     this.audioService.playNextAudio();
-
   }
   handleCenterButton() {
-    this.audioService.toggleAudio();
+    switch (this.controlsIndex) {
+      case 0 :
+        this.audioService.playPreviousAudio();
+        return;
+      case 1 :
+        this.audioService.toggleAudio();
+        return;
+      case 2 :
+        this.audioService.playNextAudio();
+        return;
+    }
   }
   handleUpButton() {}
   handleDownButton() {}
@@ -108,10 +136,29 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     this.albumImageUrl = this.defaultImageUrl;
   }
 
-  handleLeftButton(): void {
+  handleRightButton() {
+    this.playClickSound();
+    // Your row selection code
+    this.controlsList[this.controlsIndex].selected = false;
+    if (this.controlsIndex+1 < this.controlsList.length) {
+      this.controlsIndex++
+    } else {
+      this.controlsIndex = 0;
+    }
+    this.controlsList[this.controlsIndex].selected = true;
   }
 
-  handleRightButton(): void {
+  handleLeftButton() {
+    this.playClickSound();
+    // Your row selection code
+    this.controlsList[this.controlsIndex].selected = false;
+
+    if (this.controlsIndex == 0) {
+      this.controlsIndex = this.controlsList.length-1
+    } else {
+      this.controlsIndex--;
+    }
+    this.controlsList[this.controlsIndex].selected = true;
   }
 
 

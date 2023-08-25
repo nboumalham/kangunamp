@@ -2,7 +2,7 @@
 
 div.grid-container {
   display: grid;
-  height: 90vh;
+  height: 95vh;
   width: 100vw;
   //grid-template-columns: repeat(122, 1fr); // Adjust the card width as needed
   gap: 0px; // Adjust the gap between cards as needed
@@ -41,6 +41,7 @@ div.card {
   width: 100%;
   padding: 3vh 0 0 0;
 
+
   div.image {
     margin: auto;
     border: 1px solid #DDD;
@@ -49,8 +50,7 @@ div.card {
     height: var(--magic-width);
     max-width: 80%;
     overflow: hidden;
-    //background: #FFFFFF url(https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_square_small.gif) no-repeat center;
-    background: transparent;
+    background : url("/assets/images/album.png") no-repeat center / cover;
     img {
       height: 100%;
       margin: auto;

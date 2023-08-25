@@ -29,7 +29,6 @@ export class ListComponent extends KeyboardHelper implements OnInit {
     protected route: ActivatedRoute,
     protected location: Location) {
     super();
-    this.left_button_label = "Player";
     this.route.data.subscribe((data) => {
       this.config = this.getConfig(data['type']);
       // ... other actions based on config

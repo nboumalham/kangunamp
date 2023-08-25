@@ -68,7 +68,7 @@ getHeaders() : HttpHeaders {
   }
 
 listAlbums(artistId?: string): Observable<any> {
-    const key = artistId = (artistId ? artistId : "all");
+    const key = (artistId ? artistId : "all");
     const cacheKey = `albums_${key}`;
     const cachedData = this.getDataFromLocalStorage(cacheKey);
 
@@ -76,6 +76,22 @@ listAlbums(artistId?: string): Observable<any> {
       return of(cachedData);
     } else {
       const url = this.baseURL + "Items/?" + (artistId ? "ArtistIds=" + artistId + "&" : "") + "Recursive=true&IncludeItemTypes=MusicAlbum";
+      return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
+        tap(data => {
+          this.setDataToLocalStorage(cacheKey, data);
+        })
+      );
+    }
+  }
+
+  listPlaylists(): Observable<any> {
+    const cacheKey = 'playlists';
+    const cachedData = this.getDataFromLocalStorage(cacheKey);
+
+    if (cachedData) {
+      return of(cachedData);
+    } else {
+      const url = this.baseURL + "Items/?IncludeItemTypes=Playlist&Recursive=true";
       return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
         tap(data => {
           this.setDataToLocalStorage(cacheKey, data);
@@ -174,7 +190,6 @@ checkAuth(accessToken : string, userId: string) {
 startSessionPlayback(itemId: string, isPaused : boolean = false): void {
     //const cacheKey = `items_${albumId}`;
     //const cachedData = this.getDataFromLocalStorage(cacheKey);
-  console.log("fucker");
   const url = this.baseURL + "/Sessions/Playing";
   const progressInfo: PlaybackProgressInfo = new PlaybackProgressInfo({
     canSeek: true,
@@ -231,7 +246,7 @@ startSessionPlayback(itemId: string, isPaused : boolean = false): void {
 
 
 /** LOCAL STORAGE **/
- private expirationTime = 3600000; // 1 hour in milliseconds
+ private expirationTime = 1 //3600000; // 1 hour in milliseconds
 
  private getDataFromLocalStorage(key: string) {
     const data = localStorage.getItem(key);

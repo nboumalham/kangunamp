@@ -32,7 +32,6 @@ export class GridComponent extends KeyboardHelper implements OnInit {
     protected route: ActivatedRoute,
     protected location: Location) {
     super();
-    this.left_button_label = "Player";
     this.route.data.subscribe((data) => {
       this.config = this.getConfig(data['type']);
       // ... other actions based on config
@@ -53,6 +52,8 @@ export class GridComponent extends KeyboardHelper implements OnInit {
       return artistsViewConfig(this.router, this.audioService, this.jellyfinService);
       case 'albums':
       return albumsViewConfig(this.router, this.audioService, this.jellyfinService);
+      case 'playlists':
+        return albumsViewConfig(this.router, this.audioService, this.jellyfinService, false);
       case 'tracks':
       return tracksViewConfig(this.router, this.audioService, this.jellyfinService);
       default:

@@ -2,10 +2,10 @@
 // Import any necessary SCSS files and define variables here
 
 .now-playing-container {
-  --magic-width: calc(min(50vw, 80vh));
+  --magic-width: calc(min(45vw, 80vh));
   --player-font-size: 5vh;
   $horizontal-player-size: calc(120vh);
-  height: calc(90vh);
+  height: calc(95vh);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -13,40 +13,6 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
-  animation: moveBackground 60s infinite linear;
-  @keyframes moveBackground {
-    0% {
-      background-position: 0 0;
-      background-size : 100%
-    }
-
-    25% {
-      /* Adjust these values to change the range and speed of movement */
-      background-position: 50% 75%;
-      background-size : 150%
-
-    }
-
-    50% {
-      /* Adjust these values to change the range and speed of movement */
-      background-position: 100% 100%;
-      background-size : 200%
-
-    }
-
-    75% {
-      /* Adjust these values to change the range and speed of movement */
-      background-position: 75% 50%;
-      background-size : 150%
-
-    }
-
-    100% {
-      /* Adjust these values to change the range and speed of movement */
-      background-position: 0 0;
-      background-size : 100%
-    }
-  }
 
 
   .image-container {
@@ -122,6 +88,26 @@
       }
       .duration {
         float: right;
+      }
+    }
+
+    .controls-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: var(--magic-width);
+      font-size: calc(var(--player-font-size));
+      color: $secondary-text-color;
+      margin: 10vh auto;
+      span {
+        margin: 0 auto;
+        &.selected {
+        color: $primary-selected-text-color;
+          background-color: $highlight-color;
+      }
+      }
+      @media screen and (min-width: $horizontal-player-size) {
+        margin: 10vh 0;
       }
     }
   }

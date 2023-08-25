@@ -8,10 +8,11 @@ export class AudioService {
     public audio: HTMLAudioElement;
 
     public trackId : BehaviorSubject<string> = new BehaviorSubject('Unknown');
+    public parentId : BehaviorSubject<string> = new BehaviorSubject('Unknown');
     public trackName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
     public artistName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
     public albumName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
-    public albumImageUrl : BehaviorSubject<string> = new BehaviorSubject('https://cdn.iconscout.com/icon/premium/png-512-thumb/question-mark-4397530-3644875.png?f=avif&w=256');
+    public albumImageUrl : BehaviorSubject<string> = new BehaviorSubject('/assets/images/album.png');
 
     public playlistIndex : BehaviorSubject<string> = new BehaviorSubject('0 of 0');
 
@@ -76,13 +77,13 @@ export class AudioService {
 
 
     // Add a new method to set the audio queue
-    public setAudioQueue(queue: TrackItem | TrackItem[]): void {
+    public setAudioQueue(queue: TrackItem | TrackItem[], index : number = 0): void {
         // If the input is a single TrackItem, convert it into an array with one element
         if (!Array.isArray(queue)) {
             queue = [queue];
         }
         this.audioQueue = queue;
-        this.currentAudioIndex = 0;
+        this.currentAudioIndex = index;
         this.loadCurrentAudio();
     }
 
@@ -122,9 +123,11 @@ export class AudioService {
         const track = this.audioQueue[this.currentAudioIndex];
         this.setAudio(track.audioUrl);
         this.setTrackId(track.id);
+        this.setParentId(track.parentId);
         this.setTrackName(track.title);
         this.setArtistName(track.artistName);
         this.setAlbumImageUrl(track.trackImageURL);
+        this.setParentId(track.parentId);
         this.setPlaylistIndex(this.currentAudioIndex);
     }
 
@@ -135,7 +138,8 @@ export class AudioService {
             this.loadCurrentAudio();
         } else {
             this.currentAudioIndex = 0;
-            //this.loadCurrentAudio();
+            this.loadCurrentAudio();
+            this.toggleAudio();
         }
     }
 
@@ -300,6 +304,13 @@ export class AudioService {
     this.trackId.next(id);
   }
 
+  public getParentId(): Observable<string> {
+    return this.parentId.asObservable();
+  }
+
+  public setParentId(id : string) {
+    this.parentId.next(id);
+  }
      public setTrackName(name : string) {
          this.trackName.next(name);
      }

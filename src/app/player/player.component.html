@@ -1,4 +1,4 @@
-<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.99), rgba(0, 0, 0, 1) 99%),url(' + getImage(trackId, true) + ')'">
+<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.98)),url(' + getImage(parentId, true, 'Backdrop') + ')'">
   <div class="image-container">
     <div class="album-image">
       <img [src]="albumImageUrl" (error)="onImageError()" />
@@ -17,10 +17,11 @@
       <div class="duration">{{timeRemaining}}</div>
     </div>
   </div>
-  </div>
-  <div class="footer-controls">
-    <span class="footer-button">{{left_button_label}}</span>
-    <span class="footer-button">{{middle_button_label}}</span>
-    <span class="footer-button">{{right_button_label}}</span>
+    <div class ="controls-container">
+       <span *ngFor="let item of controlsList" class="list-item" [class.selected]="item.selected">
+          {{item.title}}
+       </span>
+
+    </div>
   </div>
 </div>

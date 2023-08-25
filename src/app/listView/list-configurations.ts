@@ -17,12 +17,13 @@ export const homeViewConfig = (router: Router, audioService: AudioService): List
     const items: ListItem[] = [
       new ListItem("0", "Artists", "", 0 === selectedIndex, true),
       new ListItem("1", "Albums", "", 1 === selectedIndex, true),
-      new ListItem("2", "Settings", "", 2 === selectedIndex, true),
+      new ListItem("Z", "Playlists", "", 2 === selectedIndex, true),
+      new ListItem("3", "Settings", "", 3 === selectedIndex, true),
     ];
 
     audioService.getPlayerStatus().subscribe((status) => {
       if ((status !== "stopped") && (items.findIndex(item => item.title === "Now Playing") === -1)) {
-          items.push(new ListItem("3", "Now Playing", "", 2 === selectedIndex,));
+          items.push(new ListItem("4", "Now Playing", "", 4 === selectedIndex,));
       }
     });
     return items;
@@ -33,6 +34,8 @@ export const homeViewConfig = (router: Router, audioService: AudioService): List
       router.navigate(['artists']);
     } else if (item.title === "Albums") {
       router.navigate(['albums']);
+    } else if (item.title === "Playlists") {
+      router.navigate(['playlists']);
     } else if (item.title === "Settings") {
       router.navigate(['settings']);
     } else if (item.title === "Now Playing") {
@@ -112,11 +115,11 @@ export const artistsViewConfig = (router: Router, audioService: AudioService, je
 });
 
 
-export const albumsViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService): ListConfig => ({
+export const albumsViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService, albumOrPlaylist : boolean = true): ListConfig => ({
   title: "Albums",
   fetchList: async (selectedIndex?: number, parentId?: string): Promise<ListItem[]> => {
     const items: ListItem[] = [];
-    jellyfinService.listAlbums(parentId)
+    (albumOrPlaylist ? jellyfinService.listAlbums(parentId) : jellyfinService.listPlaylists())
     .subscribe(
       albums => {
         albums.Items.forEach((album : any, index : number) => {
@@ -144,7 +147,7 @@ export const tracksViewConfig = (router: Router, audioService: AudioService, jel
 
     if (typeof parentId === 'string') {
       const tracks = await jellyfinService.listItems(parentId).toPromise();
-
+/**
       if (tracks.Items.length > 1) {
         const tracksTotalTime = tracks.Items.reduce((total: number, track : any) => total + track.RunTimeTicks, 0);
         items.push(
@@ -156,17 +159,18 @@ export const tracksViewConfig = (router: Router, audioService: AudioService, jel
           )
         );
       }
-
+**/
       tracks.Items.forEach((track: any, index: number) => {
         const listItem: TrackItem = new TrackItem(
           track.Id,
           track.Name,
           audioService.formatMicrosecondsToMMSS(track.RunTimeTicks),
-          selectedIndex === (tracks.Items.length > 1 ? index + 1 : index),
+          selectedIndex === index,
           track.Artists[0],
           track.Album,
           jellyfinService.getItemImageURL(track.Id, true),
-          jellyfinService.getTrackStream(track.Id)
+          jellyfinService.getTrackStream(track.Id),
+          track.ParentBackdropItemId
         );
 
         items.push(listItem);
@@ -176,20 +180,28 @@ export const tracksViewConfig = (router: Router, audioService: AudioService, jel
     return items;
   },
 
-  onSelectItem: (item: ListItem, items?: ListItem[]): void => {
+  onSelectItem(item: ListItem, items?: ListItem[]): void {
     if ('trackImageURL' in item) {
       const trackItem = item as TrackItem;
-      if(trackItem.id === 'play-all') {
-         if (items) {
-          audioService.setAudioQueue(items.slice(1) as TrackItem[]);
-        } else console.error('The list of tracks sent was empty');
+
+      if (trackItem.id === 'play-all') {
+        if (!items || items.length <= 1) {
+          console.error('The list of tracks sent was empty');
+          return;
+        }
+        const tracksToPlay = items.slice(1) as TrackItem[];
+        audioService.setAudioQueue(tracksToPlay);
+      } else if (items) {
+        const startIndex = items.indexOf(item);
+        if (startIndex !== -1) {
+          const tracksToPlay = items as TrackItem[];
+          audioService.setAudioQueue(tracksToPlay, startIndex);
+        }
       }
-      else audioService.setAudioQueue(trackItem);
 
       router.navigate(['player']);
-
     } else {
       console.error('Expected a TrackItem, but received a ListItem.');
     }
-  },
+  }
 });

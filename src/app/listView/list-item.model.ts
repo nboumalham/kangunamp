@@ -4,7 +4,7 @@ export class ListItem {
 	public subtitle: string;
 	public selected : boolean;
 	public hasChild : boolean = false;
-	
+
   	constructor(id: string, title: string, subtitle: string, selected : boolean, hasChild? : boolean) {
     	this.id = id;
     	this.title = title;
@@ -27,8 +27,9 @@ export class TrackItem extends ListItem {
   public duration : number = 0;
   public playing : boolean = false;
   public audioUrl : string = "";
+  public parentId : string = "";
 
-    constructor(id: string, title: string, subtitle: string, selected : boolean, artistName? : string, albumName? : string, trackImageURL? : string, audioUrl? : string) {
+    constructor(id: string, title: string, subtitle: string, selected : boolean, artistName? : string, albumName? : string, trackImageURL? : string, audioUrl? : string, parentId? : string) {
       super(id, title, subtitle, selected);
 
       if (typeof trackImageURL !== 'undefined') {
@@ -42,6 +43,9 @@ export class TrackItem extends ListItem {
       }
       if (typeof audioUrl !== 'undefined') {
         this.audioUrl = audioUrl;
+      }
+      if (typeof parentId !== 'undefined') {
+        this.parentId = parentId;
       }
   }
 }

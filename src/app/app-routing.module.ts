@@ -14,6 +14,7 @@ const routes: Routes = [
   { path: 'artists', component: GridComponent, data: { type: 'artists' } },
   { path: 'artists/:id/albums', component: GridComponent, data: { type: 'albums' } },
   { path: 'albums', component: GridComponent, data: { type: 'albums' } },
+  { path: 'playlists', component: GridComponent, data: { type: 'playlists' } },
   { path: 'albums/:id/tracks', component: ListComponent, data: { type: 'tracks' }  },
   { path: 'player', component: PlayerComponent },
   { path: 'auth', component: AuthComponent },
