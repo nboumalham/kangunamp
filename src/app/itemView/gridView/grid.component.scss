@@ -1,4 +1,5 @@
-@import '../../assets/themes/default.scss';
+@import '../../../assets/themes/default';
+@import '../item.component';
 
 div.grid-container {
   display: grid;
@@ -9,7 +10,6 @@ div.grid-container {
   overflow-y: scroll;
   overflow-x: hidden;
 }
-
 
 div.grid-item {
   $list-item-font-size: min(2vh, 5vw);
@@ -50,7 +50,6 @@ div.card {
     height: var(--magic-width);
     max-width: 80%;
     overflow: hidden;
-    background : url("/assets/images/album.png") no-repeat center / cover;
     img {
       height: 100%;
       margin: auto;

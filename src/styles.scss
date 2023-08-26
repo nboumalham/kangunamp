@@ -28,34 +28,12 @@ body {
 		margin: 0;
 	}
 }
-  //Icons
 
-      i.icon {
-      display: inline-block;
-      width: 15px; /* Set the width and height of the logo */
-      height: 15px;
-      background-size: contain; /* Scale the logo to fit within the width and height of the <i> tag */
-      background-repeat: no-repeat; /* Prevent the logo from repeating */
-        &.playing {
-          background-image : url("/assets/images/playing.png");
-        }
-        &.paused {
-          background-image : url("/assets/images/paused.png");
-        }
-        &.loading {
-          background-image : url("/assets/images/loading.png");
-        }
-        &.right_arrow_black {
-          background-image : url("/assets/images/right_arrow_black.png");
-          width: 15px; /* Set the width and height of the logo */
-          height: 10px;
-          margin: 10px;
-        }
-        &.right_arrow_white {
-          background-image : url("/assets/images/right_arrow_white.png");
-          width: 15px; /* Set the width and height of the logo */
-          height: 10px;
-          margin: 10px;
-        }
-      }
+  img.lazy {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out; /* Adjust duration and easing as needed */
+    &.loaded {
+      opacity: 1;
+    }
+  }
 }

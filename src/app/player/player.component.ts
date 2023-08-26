@@ -6,9 +6,9 @@ import { AudioService } from '../services/audio.service';
 import { SharedService } from '../services/shared.service';
 
 
-import {ListItem, TrackItem} from '../listView/list-item.model';
+import {BaseListItem, TrackItem} from '../models/list-item.model';
 import {KeyboardHelper} from '../helpers/keyboard.helper'
-import {combineLatest} from "rxjs";
+import {combineLatest, Observable} from "rxjs";
 
 @Component({
   selector: 'app-player',
@@ -16,20 +16,10 @@ import {combineLatest} from "rxjs";
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent extends KeyboardHelper implements OnInit {
-  timeElapsed : string = "--";
-  timeRemaining : string = "--";
-  progressBarWidth : string = "0%";
-  trackId : string = "0";
-  parentId : string = "";
-  trackName : string = "";
-  artistName : string = "";
-  albumImageUrl : string = "";
-  backDropImageUrl : string = "";
-  defaultImageUrl : string = "../../assets/images/album.png";
-  playlistIndex = "";
 
+  currentTrack! : Observable<TrackItem>;
 
-  public controlsList : ListItem[] = [];
+  public controlsList : BaseListItem[] = [];
   public controlsIndex = 1;
 
 
@@ -40,71 +30,61 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     protected location: Location,
     ) {
     super();
+    this.currentTrack = this.audioService.getCurrentTrackObservable();
   }
 
   ngOnInit(): void {
     this.sharedService.setTitle("Now Playing");
-    this.controlsList.push(new ListItem("0", "⏮", "", false, true));
-    this.controlsList.push(new ListItem("1", "⏳︎", "", true, true));
-    this.controlsList.push(new ListItem("2", "⏭", "", false, true));
-
-    combineLatest([
-      this.audioService.getTimeRemaining(),
-      this.audioService.getTimeElapsed(),
-      this.audioService.getPercentElapsed(),
-      this.audioService.getTrackName(),
-      this.audioService.getTrackId(),
-      this.audioService.getParentId(),
-      this.audioService.getArtistName(),
-      this.audioService.getAlbumImageUrl()
-    ]).subscribe(
-      ([timeRemaining, timeElapsed, percentElapsed, trackName, trackId, parentId, artistName, imageUrl]) => {
-        this.timeRemaining = timeRemaining;
-        this.timeElapsed = timeElapsed;
-        this.progressBarWidth = `${percentElapsed}%`;
-        this.trackName = trackName;
-        this.trackId = trackId;
-        this.artistName = artistName;
-        this.albumImageUrl = imageUrl;
-        this.parentId = parentId;
-      }
-    );
-
+    this.controlsList.push(new BaseListItem("0", "⏮", "", false, true));
+    this.controlsList.push(new BaseListItem("1", "⏳︎", "", true, true));
+    this.controlsList.push(new BaseListItem("2", "⏭", "", false, true));
 
     this.audioService.getPlaylistIndex().subscribe(playlistIndex => {
-      this.playlistIndex = playlistIndex;
-      if (this.playlistIndex == "1 of 1") {
+      if (playlistIndex === "1 of 1") {
         this.controlsList.splice(2, 1);
         this.controlsList.splice(0, 1);
       }
     });
 
-    this.audioService.getPlayerStatus().subscribe(status => {
-      let playButton = this.controlsList.find(obj => obj.id === "1");
-      if (playButton) {
-      if(status === "playing") {
-        playButton.title = "⏸";
-        this.jellyfinService.startSessionPlayback(this.trackId);
-      } else if (status === "paused") {
-        playButton.title = "⏵";
-        this.jellyfinService.startSessionPlayback(this.trackId, true);
-      } else if (status === "stopped") {
-        playButton.title = "⏹";
-        this.jellyfinService.stopSessionPlayback(this.trackId);
-      } else if (status === "loading") {
-        playButton.title = "⏳︎";
-        this.jellyfinService.stopSessionPlayback(this.trackId);
-      } else {
-        playButton.title = status;
-        this.jellyfinService.stopSessionPlayback(this.trackId);
-      }
-      }
-
-    });
+    const playButton = this.controlsList.find(obj => obj.id === "1");
+    if (playButton) {
+      this.audioService.getPlayerStatus().subscribe(status => {
+        let title = '';
+        switch (status) {
+          case "playing":
+            title = "⏸";
+            this.jellyfinService.startSessionPlayback(this.getCurrentTrackId());
+            break;
+          case "paused":
+            title = "⏵";
+            this.jellyfinService.startSessionPlayback(this.getCurrentTrackId(), true);
+            break;
+          case "stopped":
+            title = "⏹";
+            this.jellyfinService.stopSessionPlayback(this.getCurrentTrackId());
+            break;
+          case "loading":
+            title = "⏳︎";
+            break;
+          default:
+            title = status;
+            break;
+        }
+        playButton.title = title;
+      });
+    }
   }
 
-  getImage(id : string, hd : boolean = false, type: string = "Primary") : string {
-    return this.jellyfinService.getItemImageURL(id,hd,type);
+  // Add this method to get the current track's ID
+  private getCurrentTrackId(): string {
+    let currentTrackId: string = '';
+    const subscription = this.audioService.getCurrentTrackObservable().subscribe(track => {
+      if (track) {
+        currentTrackId = track.id;
+      }
+    });
+
+    return currentTrackId;
   }
 
   handleSoftLeftButton() {
@@ -131,11 +111,6 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   handleBackButton() {
     this.location.back();
   }
-
-  onImageError() {
-    this.albumImageUrl = this.defaultImageUrl;
-  }
-
   handleRightButton() {
     this.playClickSound();
     // Your row selection code
@@ -147,7 +122,6 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     }
     this.controlsList[this.controlsIndex].selected = true;
   }
-
   handleLeftButton() {
     this.playClickSound();
     // Your row selection code
@@ -160,6 +134,4 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     }
     this.controlsList[this.controlsIndex].selected = true;
   }
-
-
 }

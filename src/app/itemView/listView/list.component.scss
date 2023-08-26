@@ -1,4 +1,5 @@
-@import '../../assets/themes/default.scss';
+@import '../../../assets/themes/default';
+@import '../item.component';
 
 	ul.list-container {
         height: calc(95vh);
@@ -9,9 +10,8 @@
 
 
 	li.list-item {
-
-		$list-item-height: 8vh;
-		$list-item-font-size: 4vh;
+    $list-item-height: min(8vh, 8vw);
+		$list-item-font-size: min(4vh, 5vw);
 		text-align: left;
 		font-size: $list-item-font-size;
 		width: 100%;
@@ -25,13 +25,34 @@
 		&.selected {
 			background-color: $highlight-color;
 			color: $primary-selected-text-color;
+      span.thumbnail-placeholder {
+        transform: scale(1.15);
+        transition: transform 0.4s ease;
+      }
+    }
+    &:not(.selected) {
+      span.thumbnail-placeholder {
+        transform: scale(1); /* Reset the scale to its original size */
+        transition: transform 0.3s ease;
+      }
 		}
+    span.thumbnail-placeholder {
+      width: min(6vw, 6vh);
+      margin: auto 2vw;
+
+    img.thumbnail {
+      object-fit: cover;
+      width: 100%;
+    }
+    }
+
 		p.name {
 			padding: 0 0 0 10px;
 			white-space: nowrap;
 			overflow: hidden;
     		text-overflow: ellipsis;
-    		max-width: calc(100vw - 40px);
+    		max-width: 70vw;
+        margin-right: auto;
 		}
 		p.description {
 			font-size: $list-item-font-size;
@@ -40,14 +61,13 @@
 			padding: 0 10px 0 0;
 			white-space: nowrap;
 			overflow: hidden;
-    		text-overflow: ellipsis;
-		}
+      text-overflow: ellipsis;
+      margin-right: 0px;
+    }
 		p.icon {
 			float: right;
 			margin: auto;
 			margin-right : 10px;
-			&:nth-child(3) {
-				margin-left: 0px;
-			}
+      margin-left: 0px;
 		}
 	}

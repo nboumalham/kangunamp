@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ListComponent } from './listView/list.component';
+import { ListComponent } from './itemView/listView/list.component';
 import { PlayerComponent } from './player/player.component';
 import { AuthComponent } from './authView/auth.component';
-import {GridComponent} from "./gridView/grid.component";
+import {GridComponent} from "./itemView/gridView/grid.component";
 //import { SettingsComponent } from './settings/settings.component';
 
 const routes: Routes = [
@@ -14,8 +14,9 @@ const routes: Routes = [
   { path: 'artists', component: GridComponent, data: { type: 'artists' } },
   { path: 'artists/:id/albums', component: GridComponent, data: { type: 'albums' } },
   { path: 'albums', component: GridComponent, data: { type: 'albums' } },
-  { path: 'playlists', component: GridComponent, data: { type: 'playlists' } },
   { path: 'albums/:id/tracks', component: ListComponent, data: { type: 'tracks' }  },
+  { path: 'playlists', component: GridComponent, data: { type: 'playlists' } },
+  { path: 'playlists/:id/tracks', component: ListComponent, data: { type: 'tracks' }  },
   { path: 'player', component: PlayerComponent },
   { path: 'auth', component: AuthComponent },
   { path: '',   redirectTo: '/home', pathMatch: 'full' },

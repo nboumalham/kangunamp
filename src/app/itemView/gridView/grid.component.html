@@ -1,0 +1,22 @@
+<div class="grid-container" [ngStyle]="{'grid-template-columns': getColumnTemplate()}" (window:resize)="onResize($event)" #container>
+  <ng-container *ngIf="loading">
+    <div class="grid-item" [ngStyle]="{'width': getColumnWidth()}" [class.selected]="true">
+      <div class="card">
+        <div class="image animated-background">
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="!loading">
+  <div *ngFor="let item of itemList" class="grid-item" [ngStyle]="{'width': getColumnWidth()}" [class.selected]="item.selected">
+    <div class="card">
+      <div class="image">
+        <img class="lazy" [src]="item.imageURL" (load)="onImageLoad($event)"/>
+      </div>
+      <p class="name">{{ item.title }}</p>
+      <p class="description">{{ item.subtitle }}</p>
+      <!-- Add other card content here as needed -->
+    </div>
+  </div>
+  </ng-container>
+</div>

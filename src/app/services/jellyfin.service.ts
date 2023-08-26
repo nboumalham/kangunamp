@@ -1,36 +1,20 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {catchError, map, Observable, throwError} from 'rxjs';
+import {Router} from '@angular/router';
 import {PlaybackProgressInfo} from "./playback-progress-info";
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class JellyfinService {
 
-  constructor(private http: HttpClient, private router: Router) {
-    // Check if the access token is still valid when the component is initialized
-    const userIdToken = localStorage.getItem('jellyfin_user_id');
-    const accessToken = localStorage.getItem('jellyfin_access_token');
-    if (accessToken && userIdToken) {
-      console.log('checking access token ')
-      this.checkAuth(accessToken, userIdToken);
-    }
-    else {
-      console.log('No access TOKEN!!!')
-      this.router.navigate(['/auth']);
-    }
-  }
-
   baseURL = "https://media.boumalham.com/";
-
   client = "Kangunamp";
   device = 'Kangunamp';
   deviceId = "TW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0OyBydjo5NC4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzk0LjB8MTYzODA1MzA2OTY4Mw12";
   version = "0.0.0.1";
-
   headers = new HttpHeaders({
     'Content-Type': 'application/json',
     'X-MediaBrowser-Token': '',
@@ -41,138 +25,175 @@ export class JellyfinService {
     'DeviceId': this.deviceId,
     'Version': this.version
   });
+  /** LOCAL STORAGE **/
+  private expirationTime = 3600000; // 1 hour in milliseconds
 
-getHeaders() : HttpHeaders {
-  const accessToken = localStorage.getItem('jellyfin_access_token');
-  if (accessToken) {
-    const headersWithtoken = this.headers.set('X-MediaBrowser-Token', `${accessToken}`);
-    return headersWithtoken
-  } else return this.headers;
-}
-
-
- listArtists(): Observable<any> {
-    const cacheKey = `artists`;
-    const cachedData = this.getDataFromLocalStorage(cacheKey);
-
-    if (cachedData) {
-      return of(cachedData);
+  constructor(private http: HttpClient, private router: Router) {
+    // Check if the access token is still valid when the component is initialized
+    const userIdToken = localStorage.getItem('jellyfin_user_id');
+    const accessToken = localStorage.getItem('jellyfin_access_token');
+    if (accessToken && userIdToken) {
+      console.log('checking access token ')
+      this.checkAuth(accessToken, userIdToken);
     } else {
-      const url = this.baseURL + "artists/albumartists";
-      return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
-        tap(data => {
-          this.setDataToLocalStorage(cacheKey, data);
-        })
-      );
+      console.log('No access TOKEN!!!')
+      this.router.navigate(['/auth']);
     }
   }
 
-listAlbums(artistId?: string): Observable<any> {
-    const key = (artistId ? artistId : "all");
-    const cacheKey = `albums_${key}`;
-    const cachedData = this.getDataFromLocalStorage(cacheKey);
+  getHeaders(): HttpHeaders {
+    const accessToken = localStorage.getItem('jellyfin_access_token');
+    if (accessToken) {
+      return this.headers.set('X-MediaBrowser-Token', `${accessToken}`)
+    } else return this.headers;
+  }
 
-    if (cachedData) {
-      return of(cachedData);
-    } else {
-      const url = this.baseURL + "Items/?" + (artistId ? "ArtistIds=" + artistId + "&" : "") + "Recursive=true&IncludeItemTypes=MusicAlbum";
-      return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
-        tap(data => {
-          this.setDataToLocalStorage(cacheKey, data);
-        })
-      );
-    }
+
+  listArtists(): Observable<any> {
+    const url = this.baseURL + "artists/albumartists";
+    return this.http.get<{ Items: any[] }>(url, {
+      params: this.getBaseHttpParams(),
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => response.Items),
+      map((data: any[]) => data.map(item => ({
+        id: item.Id,
+        title: item.Name,
+        subtitle: '',
+        imageURL: this.getItemImageURL(item.Id),
+      }))),
+      catchError(error => throwError(error))
+    );
+  }
+
+  listAlbums(artistId: string = "all"): Observable<any> {
+    const url = this.baseURL + "Items/?" + (artistId !== "all" ? "ArtistIds=" + artistId + "&" : "") + "Recursive=true&IncludeItemTypes=MusicAlbum";
+    return this.http.get<{ Items: any[] }>(url, {
+      params: this.getBaseHttpParams(),
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => response.Items),
+      map((data: any[]) => data.map(item => ({
+        id: item.Id,
+        title: item.Name,
+        subtitle: '',
+        imageURL: this.getItemImageURL(item.Id),
+      }))),
+      catchError(error => throwError(error))
+    );
   }
 
   listPlaylists(): Observable<any> {
-    const cacheKey = 'playlists';
-    const cachedData = this.getDataFromLocalStorage(cacheKey);
-
-    if (cachedData) {
-      return of(cachedData);
-    } else {
-      const url = this.baseURL + "Items/?IncludeItemTypes=Playlist&Recursive=true";
-      return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
-        tap(data => {
-          this.setDataToLocalStorage(cacheKey, data);
-        })
-      );
-    }
+    const url = this.baseURL + "Items/?Recursive=true&IncludeItemTypes=Playlist";
+    return this.http.get<{ Items: any[] }>(url, {
+      params: this.getBaseHttpParams(),
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => response.Items),
+      map((data: any[]) => data.map(item => ({
+        id: item.Id,
+        title: item.Name,
+        subtitle: '',
+        imageURL: this.getItemImageURL(item.Id),
+      }))),
+      catchError(error => throwError(error))
+    );
   }
 
-  listItems(albumId: string): Observable<any> {
-    const cacheKey = `items_${albumId}`;
-    const cachedData = this.getDataFromLocalStorage(cacheKey);
-
-    if (cachedData) {
-      return of(cachedData);
-    } else {
-      const url = this.baseURL + "Items/?ParentId=" + albumId;
-      return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
-        tap(data => {
-          this.setDataToLocalStorage(cacheKey, data);
-        })
-      );
-    }
+  listTracks(albumId: string = "all"): Observable<any> {
+    const url = this.baseURL + "Items/?ParentId=" + albumId;
+    return this.http.get<{ Items: any[] }>(url, {
+      params: this.getBaseHttpParams(),
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => response.Items),
+      map((data: any[]) => data.map(item => ({
+        id: item.Id,
+        title: item.Name,
+        parentId: item.AlbumId,
+        albumArtists: item.AlbumArtist,
+        subtitle: this.formatMicrosecondsToMMSS(item.RunTimeTicks),
+        album: item.Album,
+        imageURL: this.getItemImageURL(item.Id, true),
+        audioTrackURL: this.getTrackStream(item.Id),
+        backdropImage: this.getItemImageURL(item.ParentBackdropItemId, true, "Backdrop"),
+        durationInMilliseconds: item.RunTimeTicks / 10000000
+      }))),
+      catchError(error => throwError(error))
+    );
   }
 
-getItemImageURL(itemId : string, hd: boolean = false, type : string = "Primary") : string {
-  return this.baseURL + "/Items/" + itemId + "/Images/" + type + (hd ? "" : "?fillWidth=200&fillHeight=200&quality=90");
-}
 
-getTrackStream(trackId : string) :string {
-	const url = this.baseURL + `Audio/${trackId}/stream`;
-	const params = new HttpParams({ fromObject: this.getBaseHttpParams() });
-  return url + '?' + params.toString();
-}
+  private formatMicrosecondsToMMSS(microseconds: number): string {
+    // Convert microseconds to seconds
+    const secondsTotal = Math.floor(microseconds / 10000000);
 
-getBaseHttpParams() {
+    // Calculate minutes and seconds
+    const minutes = Math.floor(secondsTotal / 60);
+    const seconds = secondsTotal % 60;
 
-    var params = {
-       "UserId":  `${localStorage.getItem('jellyfin_user_id')}`,
-       "api_key" : `${localStorage.getItem('jellyfin_access_token')}`,
-       "DeviceId" : `${this.deviceId}`
-     };
-    return params;
-}
+    // Pad seconds with a leading zero if less than 10
+    const paddedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
 
-/*****************************************************************************/
-/*  AUTHENTICATION
-/*****************************************************************************/
+    return `${minutes}:${paddedSeconds}`;
+  }
 
+  private getItemImageURL(itemId: string, hd: boolean = false, type: string = "Primary"): string {
+    return this.baseURL + "/Items/" + itemId + "/Images/" + type + (hd ? "" : "?fillWidth=200&fillHeight=200&quality=90");
+  }
+
+  getTrackStream(trackId: string): string {
+    const url = this.baseURL + `Audio/${trackId}/stream`;
+    const params = new HttpParams({fromObject: this.getBaseHttpParams()});
+    return url + '?' + params.toString();
+  }
+
+  /*****************************************************************************/
+  /*  AUTHENTICATION
+  /*****************************************************************************/
+
+  private getBaseHttpParams() {
+
+    return {
+      "UserId": `${localStorage.getItem('jellyfin_user_id')}`,
+      "api_key": `${localStorage.getItem('jellyfin_access_token')}`,
+      "DeviceId": `${this.deviceId}`
+    };
+  }
 
 //REGULAR USERNAME PASSWORD AUTH (not used in this app but I want to keep it)
-authenticate(username : string, password : string ) : Observable<any> {
+  authenticate(username: string, password: string): Observable<any> {
     const url = this.baseURL + '/Users/authenticatebyname';
-    const body = { Username: username,
-                   Pw: password,
-                 };
+    const body = {
+      Username: username,
+      Pw: password,
+    };
     return this.http.post(url, body, {headers: this.headers});
-}
+  }
 
 // QUICK CONNECT
-initiateQuickConnect(): Observable<any> {
-  const url = this.baseURL + '/QuickConnect/Initiate';
-  return this.http.get(url, { headers: this.getHeaders() });
-}
+  initiateQuickConnect(): Observable<any> {
+    const url = this.baseURL + '/QuickConnect/Initiate';
+    return this.http.get(url, {headers: this.getHeaders()});
+  }
 
-checkQuickConnectStatus(secret: string): Observable<any> {
-  const url = this.baseURL + '/QuickConnect/Connect';
-  const params = new HttpParams().set('secret', secret);
-  return this.http.get(url, { params, headers: this.getHeaders() });
-}
+  checkQuickConnectStatus(secret: string): Observable<any> {
+    const url = this.baseURL + '/QuickConnect/Connect';
+    const params = new HttpParams().set('secret', secret);
+    return this.http.get(url, {params, headers: this.getHeaders()});
+  }
 
-authenticateWithQuickConnect(secret: string): Observable<any> {
-  const url = this.baseURL + '/Users/AuthenticateWithQuickConnect';
-  const body = { Secret: secret };
-  return this.http.post(url, body, { headers: this.getHeaders() });
-}
+  authenticateWithQuickConnect(secret: string): Observable<any> {
+    const url = this.baseURL + '/Users/AuthenticateWithQuickConnect';
+    const body = {Secret: secret};
+    return this.http.post(url, body, {headers: this.getHeaders()});
+  }
 
 //Checks if token is still valid
-checkAuth(accessToken : string, userId: string) {
-     const url = this.baseURL + `/Users/${userId}`;
-     const headersWithtoken = this.headers.set('X-MediaBrowser-Token', `${accessToken}`);
-     this.http.get(url, { headers: headersWithtoken }).subscribe(
+  checkAuth(accessToken: string, userId: string) {
+    const url = this.baseURL + `/Users/${userId}`;
+    const headersWithtoken = this.headers.set('X-MediaBrowser-Token', `${accessToken}`);
+    this.http.get(url, {headers: headersWithtoken}).subscribe(
       (response: any) => {
         console.log("token still valid")
         // The access token is still valid, do nothing
@@ -185,53 +206,20 @@ checkAuth(accessToken : string, userId: string) {
     );
   }
 
-/** SESSION MANAGEMENT **/
+  /** SESSION MANAGEMENT **/
 
-startSessionPlayback(itemId: string, isPaused : boolean = false): void {
+  startSessionPlayback(itemId: string, isPaused: boolean = false): void {
     //const cacheKey = `items_${albumId}`;
     //const cachedData = this.getDataFromLocalStorage(cacheKey);
-  const url = this.baseURL + "/Sessions/Playing";
-  const progressInfo: PlaybackProgressInfo = new PlaybackProgressInfo({
-    canSeek: true,
-    itemId: itemId,
-    isPaused: isPaused,
-    isMuted: false,
-    // Set other properties as needed
-  });
-  this.http.post(url,  progressInfo, {headers: this.getHeaders()}).subscribe(
-    (response) => {
-      // Handle successful response if needed
-      console.log('Playback started:', response);
-    },
-    (error) => {
-      // Handle error if needed
-      console.error('Error starting playback:', error);
-    }
-  );
-  }
-
-  getSessionPlayback(itemId: string): Observable<any> {
-    //const cacheKey = `items_${albumId}`;
-    //const cachedData = this.getDataFromLocalStorage(cacheKey);
-    const url = this.baseURL + "/Sessions/Playing/Progress";
-    return this.http.get(url, { params: this.getBaseHttpParams(), headers: this.getHeaders() }).pipe(
-      tap(data => {
-      })
-    );
-  }
-
-  stopSessionPlayback(itemId: string): void {
-    //const cacheKey = `items_${albumId}`;
-    //const cachedData = this.getDataFromLocalStorage(cacheKey);
-    const url = this.baseURL + "/Sessions/Playing/Stopped";
+    const url = this.baseURL + "/Sessions/Playing";
     const progressInfo: PlaybackProgressInfo = new PlaybackProgressInfo({
       canSeek: true,
       itemId: itemId,
-      isPaused: false,
+      isPaused: isPaused,
       isMuted: false,
       // Set other properties as needed
     });
-    this.http.post(url,  progressInfo, {headers: this.getHeaders()}).subscribe(
+    this.http.post(url, progressInfo, {headers: this.getHeaders()}).subscribe(
       (response) => {
         // Handle successful response if needed
         console.log('Playback started:', response);
@@ -242,31 +230,24 @@ startSessionPlayback(itemId: string, isPaused : boolean = false): void {
       }
     );
   }
-
-
-
-/** LOCAL STORAGE **/
- private expirationTime = 1 //3600000; // 1 hour in milliseconds
-
- private getDataFromLocalStorage(key: string) {
-    const data = localStorage.getItem(key);
-    if (data) {
-      const parsedData = JSON.parse(data);
-      const currentTime = new Date().getTime();
-      if (parsedData.timestamp && currentTime - parsedData.timestamp < this.expirationTime) {
-        return parsedData.data;
+    stopSessionPlayback(itemId: string): void {
+    const url = this.baseURL + "/Sessions/Playing/Stopped";
+    const progressInfo: PlaybackProgressInfo = new PlaybackProgressInfo({
+      canSeek: true,
+      itemId: itemId,
+      isPaused: false,
+      isMuted: false,
+      // Set other properties as needed
+    });
+    this.http.post(url, progressInfo, {headers: this.getHeaders()}).subscribe(
+      (response) => {
+        // Handle successful response if needed
+        console.log('Playback started:', response);
+      },
+      (error) => {
+        // Handle error if needed
+        console.error('Error starting playback:', error);
       }
-    }
-    return null;
+    );
   }
-
-  private setDataToLocalStorage(key: string, data: any) {
-    const currentTime = new Date().getTime();
-    const storageData = {
-      data: data,
-      timestamp: currentTime
-    };
-    localStorage.setItem(key, JSON.stringify(storageData));
-  }
-
 }

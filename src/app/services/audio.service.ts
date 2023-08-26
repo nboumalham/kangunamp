@@ -1,26 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { TrackItem } from '../listView/list-item.model';
+import {TrackItem} from "../models/list-item.model";
 
 @Injectable()
 export class AudioService {
 
     public audio: HTMLAudioElement;
 
-    public trackId : BehaviorSubject<string> = new BehaviorSubject('Unknown');
-    public parentId : BehaviorSubject<string> = new BehaviorSubject('Unknown');
-    public trackName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
-    public artistName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
-    public albumName : BehaviorSubject<string> = new BehaviorSubject('Unknown');
-    public albumImageUrl : BehaviorSubject<string> = new BehaviorSubject('/assets/images/album.png');
-
     public playlistIndex : BehaviorSubject<string> = new BehaviorSubject('0 of 0');
-
     public timeElapsed: BehaviorSubject<string> = new BehaviorSubject('00:00');
     public timeRemaining: BehaviorSubject<string> = new BehaviorSubject('-00:00');
     public percentElapsed: BehaviorSubject<number> = new BehaviorSubject(0);
     public percentLoaded: BehaviorSubject<number> = new BehaviorSubject(0);
     public playerStatus: BehaviorSubject<string> = new BehaviorSubject('stopped');
+    public currentTrack: BehaviorSubject<TrackItem> = new BehaviorSubject(new TrackItem("-1", "--", "--", true, false, "--", "--", "", true, "", "-1", 0));
 
 
     //for playlists
@@ -43,7 +36,7 @@ export class AudioService {
 
     private calculateTime = (evt : any) => {
         let ct = this.audio.currentTime;
-        let d = this.audio.duration;
+        let d = this.getCurrentTrack().durationInMilliseconds;
         this.setTimeElapsed(ct);
         this.setPercentElapsed(d, ct);
         this.setTimeRemaining(d, ct);
@@ -61,21 +54,6 @@ export class AudioService {
         }
     }
 
-    public formatMicrosecondsToMMSS(microseconds: number): string {
-        // Convert microseconds to seconds
-        const secondsTotal = Math.floor(microseconds / 10000000);
-
-        // Calculate minutes and seconds
-        const minutes = Math.floor(secondsTotal / 60);
-        const seconds = secondsTotal % 60;
-
-        // Pad seconds with a leading zero if less than 10
-        const paddedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
-
-        return `${minutes}:${paddedSeconds}`;
-    }
-
-
     // Add a new method to set the audio queue
     public setAudioQueue(queue: TrackItem | TrackItem[], index : number = 0): void {
         // If the input is a single TrackItem, convert it into an array with one element
@@ -87,6 +65,13 @@ export class AudioService {
         this.loadCurrentAudio();
     }
 
+    public getAudioQueue(): TrackItem[] {
+        return this.audioQueue;
+    }
+
+    public getCurrentTrack(): TrackItem{
+     return this.audioQueue[this.currentAudioIndex];
+    }
 
     //method to handle the 'ended' event
     private handleAudioEnded = (evt: any) => {
@@ -120,15 +105,10 @@ export class AudioService {
             return;
         }
 
-        const track = this.audioQueue[this.currentAudioIndex];
-        this.setAudio(track.audioUrl);
-        this.setTrackId(track.id);
-        this.setParentId(track.parentId);
-        this.setTrackName(track.title);
-        this.setArtistName(track.artistName);
-        this.setAlbumImageUrl(track.trackImageURL);
-        this.setParentId(track.parentId);
+        const track = this.getCurrentTrack();
+        this.setAudio(track.audioTrackURL);
         this.setPlaylistIndex(this.currentAudioIndex);
+        this.setCurrentTrack(track);
     }
 
     //methods to navigate the audio queue
@@ -296,45 +276,6 @@ export class AudioService {
          (this.audio.paused) ? this.audio.play() : this.audio.pause();
      }
 
-  public getTrackId(): Observable<string> {
-    return this.trackId.asObservable();
-  }
-
-  public setTrackId(id : string) {
-    this.trackId.next(id);
-  }
-
-  public getParentId(): Observable<string> {
-    return this.parentId.asObservable();
-  }
-
-  public setParentId(id : string) {
-    this.parentId.next(id);
-  }
-     public setTrackName(name : string) {
-         this.trackName.next(name);
-     }
-
-     public getTrackName(): Observable<string> {
-         return this.trackName.asObservable();
-     }
-
-     public setArtistName(name : string) {
-         this.artistName.next(name);
-     }
-
-     public getArtistName(): Observable<string> {
-         return this.artistName.asObservable();
-     }
-
-     public setAlbumImageUrl(imageUrl : string) {
-         this.albumImageUrl.next(imageUrl);
-     }
-
-     public getAlbumImageUrl(): Observable<string> {
-         return this.albumImageUrl.asObservable();
-     }
-
      public setPlaylistIndex(index : number) {
          this.playlistIndex.next((index + 1) + " of " + this.audioQueue.length);
      }
@@ -342,4 +283,12 @@ export class AudioService {
      public getPlaylistIndex() : Observable<string> {
          return this.playlistIndex.asObservable();
      }
+
+     // Add methods to get and set the currentTrack as a BehaviorSubject
+      public setCurrentTrack(track: TrackItem): void {
+          this.currentTrack.next(track);
+      }
+      public getCurrentTrackObservable(): Observable<TrackItem> {
+          return this.currentTrack.asObservable();
+      }
  }

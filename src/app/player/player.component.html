@@ -1,20 +1,20 @@
-<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.98)),url(' + getImage(parentId, true, 'Backdrop') + ')'">
+<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.98)),url(' + (currentTrack | async)?.backdropImage + ')'">
   <div class="image-container">
     <div class="album-image">
-      <img [src]="albumImageUrl" (error)="onImageError()" />
+      <img [src]="(currentTrack | async)?.imageURL" />
     </div>
   </div>
   <div class="progress-info-container">
     <div class="now-playing-info">
-      <h2 *ngIf="playlistIndex !== '1 of 1'" class="now-playing-artist">{{ playlistIndex }}</h2>
-      <h1 class="now-playing-title">{{ trackName }}</h1>
-      <h2 class="now-playing-artist">{{ artistName }}</h2>
+      <h2 *ngIf="(audioService.getPlaylistIndex() | async) !== '1 of 1'" class="now-playing-artist">{{ audioService.getPlaylistIndex() | async }}</h2>
+      <h1 class="now-playing-title">{{ (currentTrack | async)?.title }}</h1>
+      <h2 class="now-playing-artist">{{ (currentTrack | async)?.albumArtists }}</h2>
     </div>
     <div class="progress-container">
-    <div class="progress-bar" [style.width]="progressBarWidth"></div>
+    <div class="progress-bar" [style.width]="(audioService.getPercentElapsed() | async) + '%'"></div>
     <div class="time-display">
-      <div class="current-time">{{timeElapsed}}</div>
-      <div class="duration">{{timeRemaining}}</div>
+      <div class="current-time">{{ audioService.getTimeElapsed() | async }}</div>
+      <div class="duration">{{ audioService.getTimeRemaining() | async }}</div>
     </div>
   </div>
     <div class ="controls-container">
