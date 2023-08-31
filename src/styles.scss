@@ -1,8 +1,12 @@
 @import './assets/themes/default.scss';
+@import './assets/font-icons/icons.scss';
 
 body {
 	margin: 0;
 	font-family: 'iPod';
+  background-color: $background-color;
+  overflow: hidden;
+  user-select: none;
 
 	h1 {
 		font-size: 1.5em;
@@ -29,11 +33,25 @@ body {
 	}
 }
 
-  img.lazy {
+  img {
     opacity: 0;
-    transition: opacity 0.5s ease-in-out; /* Adjust duration and easing as needed */
+    transition: opacity 400ms ease-in-out; /* Adjust duration and easing as needed */
     &.loaded {
+      opacity: 1;
+    } &.not-loaded {
       opacity: 1;
     }
   }
+
+  // Define variables for default values
+  --header-height: 5vh;
+  --container-height: calc(100vh - var(--header-height));
+  --header-color: transparent;
+
+  @media (orientation: portrait) {
+    --header-height: min(9vh, 15vw);
+    --container-height: calc(100vh - var(--header-height));
+    --header-color: #914CB4;
+  }
+
 }

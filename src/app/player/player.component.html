@@ -1,7 +1,7 @@
-<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.98)),url(' + (currentTrack | async)?.backdropImage + ')'">
+<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.98), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.98)),url(' + (currentTrack | async)?.backdropImage + ')'">
   <div class="image-container">
     <div class="album-image">
-      <img [src]="(currentTrack | async)?.imageURL" />
+      <img [src]="(currentTrack | async)?.imageURL"/>
     </div>
   </div>
   <div class="progress-info-container">
@@ -18,8 +18,8 @@
     </div>
   </div>
     <div class ="controls-container">
-       <span *ngFor="let item of controlsList" class="list-item" [class.selected]="item.selected">
-          {{item.title}}
+       <span *ngFor="let item of controlsList" class="list-item" [class.selected]="item.selected" (click)="clickItem(item)">
+         <i [class]="item.subtitle"></i>
        </span>
 
     </div>

@@ -1,4 +1,4 @@
-<div class="grid-container" [ngStyle]="{'grid-template-columns': getColumnTemplate()}" (window:resize)="onResize($event)" #container>
+  <div class="grid-container" [ngStyle]="{'grid-template-columns': getColumnTemplate()}" #container>
   <ng-container *ngIf="loading">
     <div class="grid-item" [ngStyle]="{'width': getColumnWidth()}" [class.selected]="true">
       <div class="card">
@@ -8,10 +8,10 @@
     </div>
   </ng-container>
   <ng-container *ngIf="!loading">
-  <div *ngFor="let item of itemList" class="grid-item" [ngStyle]="{'width': getColumnWidth()}" [class.selected]="item.selected">
+  <div *ngFor="let item of itemList" class="grid-item" [ngStyle]="{'width': getColumnWidth()}" [class.selected]="item.selected" (click)="selectItem(item)">
     <div class="card">
       <div class="image">
-        <img class="lazy" [src]="item.imageURL" (load)="onImageLoad($event)"/>
+        <img [src]="item.imageURL"/>
       </div>
       <p class="name">{{ item.title }}</p>
       <p class="description">{{ item.subtitle }}</p>

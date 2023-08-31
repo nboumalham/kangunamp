@@ -1,12 +1,9 @@
 import {Component } from '@angular/core';
-import {BaseListItem} from '../../models/list-item.model';
-
-
-
 import {ItemComponent} from "../item.component";
 import {KeyboardHelper} from "../../helpers/keyboard.helper";
 
 @Component({
+  selector: 'item-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss', '../../../assets/themes/default.scss'],
   providers: [{ provide: KeyboardHelper, useExisting: ItemComponent }]
@@ -44,7 +41,6 @@ export class ListComponent extends ItemComponent {
       containerElement.scrollTop = selectedItemBottom - containerHeight;
     }
   }
-
   /** KEYBOARD HELPER METHODS **/
   handleDownButton() {
     this.nextItem();
@@ -67,4 +63,5 @@ export class ListComponent extends ItemComponent {
   }
   handleRightButton(): void {
   }
+
 }

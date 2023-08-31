@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {catchError, map, Observable, throwError} from 'rxjs';
+import {catchError, map, Observable, startWith, throwError} from 'rxjs';
 import {Router} from '@angular/router';
 import {PlaybackProgressInfo} from "./playback-progress-info";
+import {BaseListItem, BaseListItemType} from "../models/list-item.model";
 
 
 @Injectable({
@@ -66,22 +67,36 @@ export class JellyfinService {
     );
   }
 
-  listAlbums(artistId: string = "all"): Observable<any> {
+  listAlbums(artistId: string = "all"): Observable<BaseListItem[] | any> {
     const url = this.baseURL + "Items/?" + (artistId !== "all" ? "ArtistIds=" + artistId + "&" : "") + "Recursive=true&IncludeItemTypes=MusicAlbum";
-    return this.http.get<{ Items: any[] }>(url, {
+    const additionalItem = {
+      type: BaseListItemType.ARTIST,
+      id: artistId,
+      title: "All Artist Tracks",
+      subtitle: "",
+      imageURL: this.getItemImageURL(artistId, false, "Primary")
+    };
+
+    return this.http.get<{ Items: BaseListItem[] }>(url, {
       params: this.getBaseHttpParams(),
       headers: this.getHeaders()
     }).pipe(
       map(response => response.Items),
-      map((data: any[]) => data.map(item => ({
-        id: item.Id,
-        title: item.Name,
-        subtitle: '',
-        imageURL: this.getItemImageURL(item.Id),
-      }))),
-      catchError(error => throwError(error))
+      map((data: any[]) => [
+        additionalItem,
+        ...data.map(item => ({
+          type: BaseListItemType.ALBUM,
+          id: item.Id,
+          title: item.Name,
+          subtitle: '',
+          imageURL: this.getItemImageURL(item.Id),
+        }))
+      ]),
+      catchError(error => throwError(error)),
+      startWith([additionalItem]) // Prepend the additional item to the list
     );
   }
+
 
   listPlaylists(): Observable<any> {
     const url = this.baseURL + "Items/?Recursive=true&IncludeItemTypes=Playlist";
@@ -100,8 +115,17 @@ export class JellyfinService {
     );
   }
 
-  listTracks(albumId: string = "all"): Observable<any> {
-    const url = this.baseURL + "Items/?ParentId=" + albumId;
+  listAlbumTracks(albumtId: string): Observable<any> {
+    const url = this.baseURL + "Items/?" + `ParentId=${albumtId}`;
+    return this.listTracks(url)
+  }
+
+  listArtistTracks(albumArtistId: string = "all"): Observable<any> {
+    const url = this.baseURL + "Items/?" + (albumArtistId === "all" ? '' : `AlbumArtistIds=${albumArtistId}`) + "&Recursive=true&IncludeItemTypes=Audio";
+    return this.listTracks(url)
+  }
+
+  protected listTracks(url: string): Observable<any> {
     return this.http.get<{ Items: any[] }>(url, {
       params: this.getBaseHttpParams(),
       headers: this.getHeaders()
@@ -109,6 +133,7 @@ export class JellyfinService {
       map(response => response.Items),
       map((data: any[]) => data.map(item => ({
         id: item.Id,
+        indexNumber: item.IndexNumber,
         title: item.Name,
         parentId: item.AlbumId,
         albumArtists: item.AlbumArtist,
@@ -117,7 +142,7 @@ export class JellyfinService {
         imageURL: this.getItemImageURL(item.Id, true),
         audioTrackURL: this.getTrackStream(item.Id),
         backdropImage: this.getItemImageURL(item.ParentBackdropItemId, true, "Backdrop"),
-        durationInMilliseconds: item.RunTimeTicks / 10000000
+        durationInMilliseconds: item.RunTimeTicks / 10000000,
       }))),
       catchError(error => throwError(error))
     );

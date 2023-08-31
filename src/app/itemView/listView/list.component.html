@@ -9,10 +9,10 @@
     </li>
   </ng-container>
   <ng-container *ngIf="!loading">
-	<li *ngFor="let item of itemList" class="list-item" [class.selected]="item.selected">
+	<li *ngFor="let item of itemList" class="list-item" [class.selected]="item.selected" (click)="selectItem(item)" (mousemove)="mouseEnter(item)">
     <ng-container *ngIf="showThumbnails">
       <span class="thumbnail-placeholder">
-        <img class="thumbnail lazy" [src]="item.imageURL" (load)="onImageLoad($event)"/>
+        <img class="thumbnail" [src]="item.imageURL"/>
       </span>
     </ng-container>
     <p class="name">{{item.title}}</p>

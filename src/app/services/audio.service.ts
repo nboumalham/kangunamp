@@ -19,6 +19,7 @@ export class AudioService {
     //for playlists
     public audioQueue: TrackItem[] = [];
     public currentAudioIndex: number = 0;
+    public shuffle: boolean = false;
 
     constructor() {
         this.audio = new Audio();
@@ -63,6 +64,45 @@ export class AudioService {
         this.audioQueue = queue;
         this.currentAudioIndex = index;
         this.loadCurrentAudio();
+
+      this.currentTrack.subscribe((track : TrackItem)=> {
+        if ('mediaSession' in navigator) {
+          // Set media metadata
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title,
+            artist: track.albumArtists,
+            album: track.album,
+            artwork: [
+              { src: track.imageURL + "?fillWidth=96&fillHeight=96&quality=90", sizes: '96x96', type: 'image/jpeg' },
+              { src: track.imageURL + "?fillWidth=128&fillHeight=128&quality=90", sizes: '128x128', type: 'image/jpeg' },
+              { src: track.imageURL + "?fillWidth=192&fillHeight=192&quality=90", sizes: '192x192', type: 'image/jpeg' },
+              { src: track.imageURL + "?fillWidth=256&fillHeight=256&quality=90", sizes: '256x256', type: 'image/jpeg' },
+              { src: track.imageURL + "?fillWidth=384&fillHeight=384&quality=90", sizes: '384x384', type: 'image/jpeg' },
+              { src: track.imageURL + "?fillWidth=512&fillHeight=512&quality=90", sizes: '512x512', type: 'image/jpeg' },
+            ]
+          });
+        }
+      });
+      if ('mediaSession' in navigator) {
+        // Set media controls
+        navigator.mediaSession.setActionHandler('play', () => {
+          // Handle play action
+          this.playAudio();
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+          // Handle pause action
+          this.pauseAudio();
+        });
+        // More action handlers like next, prev, seekbackward, seekforward, etc.
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+          // Handle pause action
+          this.playPreviousAudio();
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+          // Handle pause action
+          this.playNextAudio();
+        });
+      }
     }
 
     public getAudioQueue(): TrackItem[] {
@@ -104,7 +144,6 @@ export class AudioService {
         if (this.audioQueue.length === 0 || this.currentAudioIndex >= this.audioQueue.length) {
             return;
         }
-
         const track = this.getCurrentTrack();
         this.setAudio(track.audioTrackURL);
         this.setPlaylistIndex(this.currentAudioIndex);
@@ -132,6 +171,40 @@ export class AudioService {
             this.loadCurrentAudio();
         }
     }
+
+    //method to toggle shuffle. It will take the audio queue and shuffle it. keeping the original order in a new array that will be used to unshuffle.
+    public toggleShuffle(): void {
+        if (this.shuffle) {
+            this.shuffle = false;
+            this.audioQueue = this.audioQueue.sort((a, b) => a.indexNumber - b.indexNumber);
+            this.currentAudioIndex = this.audioQueue.indexOf(this.getCurrentTrack());
+            //this.loadCurrentAudio();
+        } else {
+            this.shuffle = true;
+            this.audioQueue = this.shuffleArray(this.audioQueue);
+            this.currentAudioIndex = this.audioQueue.indexOf(this.getCurrentTrack());
+            //this.loadCurrentAudio();
+        }
+    }
+
+    //method to shuffle the audio queue
+  private shuffleArray(array: TrackItem[]): TrackItem[] {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (currentIndex > this.currentAudioIndex + 1) {
+      // Pick a remaining element (excluding the item at currentAudioIndex and before it)...
+      randomIndex = Math.floor(Math.random() * (currentIndex - this.currentAudioIndex - 1)) + this.currentAudioIndex + 1;
+
+      currentIndex--;
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+    return array;
+  }
+
 
     /**
      * If you need the audio instance in your component for some reason, use this.

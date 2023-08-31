@@ -5,7 +5,7 @@ import {
   aboutViewConfig, albumsViewConfig,
   artistsViewConfig,
   homeViewConfig,
-  ListConfig, playlistViewConfig,
+  ListConfig, playlistViewConfig, queueTracksViewConfig,
   settingsViewConfig,
   themesViewConfig, tracksViewConfig
 } from "./list-configurations";
@@ -14,11 +14,10 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AudioService} from "../services/audio.service";
 import {JellyfinService} from "../services/jellyfin.service";
 import {Location} from "@angular/common";
-
 @Component({
   template: '',
 })
-export abstract class ItemComponent extends KeyboardHelper implements OnInit {
+export abstract class ItemComponent extends KeyboardHelper implements OnInit  {
 
   @ViewChild('container') container!: ElementRef;
   public itemList : BaseListItem[] = [];
@@ -52,11 +51,6 @@ export abstract class ItemComponent extends KeyboardHelper implements OnInit {
     this.sharedService.setTitle(this.config.title);
   }
 
-  public onImageLoad(event: Event) {
-    const target = event.target as HTMLImageElement;
-    target.classList.add('loaded');
-  }
-
   protected getConfig(type: string): ListConfig {
     switch (type) {
       case 'home':
@@ -73,15 +67,21 @@ export abstract class ItemComponent extends KeyboardHelper implements OnInit {
         return playlistViewConfig(this.router, this.audioService, this.jellyfinService);
       case 'albums':
         return albumsViewConfig(this.router, this.audioService, this.jellyfinService);
-      case 'tracks':
-        return tracksViewConfig(this.router, this.audioService, this.jellyfinService);
+      case 'playlistTracks':
+        return tracksViewConfig(this.router, this.audioService, this.jellyfinService, true);
+      case 'albumTracks':
+        return tracksViewConfig(this.router, this.audioService, this.jellyfinService, true);
+      case 'artistTracks':
+        return tracksViewConfig(this.router, this.audioService, this.jellyfinService, false);
+      case 'queueTracks':
+        return queueTracksViewConfig(this.location, this.audioService, this.sharedService);
       default:
         throw new Error('Invalid configuration type');
     }
   }
-  protected selectItem() {
-    const item = this.itemList[this.index];
-    this.sharedService.updateViewIndex(this.index, item.hasChild);
+  protected selectItem(selectedItem?: BaseListItem | undefined) {
+    const item = selectedItem ?  selectedItem : this.itemList[this.index];
+    this.sharedService.updateViewIndex(this.index,0);
     this.config.onSelectItem(item, this.itemList);
   };
   protected nextItem() {
@@ -115,9 +115,12 @@ export abstract class ItemComponent extends KeyboardHelper implements OnInit {
         this.location.back();
       }
     }
-
-
-
   /** abstract methods */
   abstract scrollToSelected(): void;
+
+  protected mouseEnter(item: BaseListItem) {
+    this.itemList[this.index].selected = false;
+    item.selected = true;
+    this.index = this.itemList.indexOf(item);
+  }
 }

@@ -3,12 +3,12 @@
 
 div.grid-container {
   display: grid;
-  height: 95vh;
+  height: var(--container-height);
   width: 100vw;
-  //grid-template-columns: repeat(122, 1fr); // Adjust the card width as needed
   gap: 0px; // Adjust the gap between cards as needed
   overflow-y: scroll;
   overflow-x: hidden;
+  background-color: $background-color;
 }
 
 div.grid-item {

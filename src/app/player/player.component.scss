@@ -1,19 +1,24 @@
 @import '../../assets/themes/default.scss';
-// Import any necessary SCSS files and define variables here
 
 .now-playing-container {
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
   --magic-width: calc(min(45vw, 80vh));
-  --player-font-size: 5vh;
-  $horizontal-player-size: calc(120vh);
-  height: calc(95vh);
+  @media (orientation : portrait) {
+    --magic-width: calc(min(95vw, 45vh));
+  }
+
+
+  --player-font-size: min(4vh, 8vw);
+  $horizontal-player-size: calc(101vh);
+  height: var(--container-height);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 0 0;
-
 
   .image-container {
     .album-image {
@@ -28,7 +33,7 @@
         object-fit: cover;
       }
     }
-    @media screen and (min-width: $horizontal-player-size) {
+    @media (orientation : landscape) {
       margin: auto;
     }
   }
@@ -36,14 +41,14 @@
   .progress-info-container {
     text-align: center;
     margin-top: 2vh;
-    width: 80vw;
-    @media screen and (min-width: $horizontal-player-size) {
+    width: var(--magic-width);
+    @media (orientation : landscape) {
       width: 40vw;
-      margin: auto;
-      margin-left: 0px;
+      margin: auto auto auto 0;
       text-align: left;
     }
     .now-playing-info {
+      display: block;
       .now-playing-title, .now-playing-artist {
         font-size: var(--player-font-size);
         margin: 0.2vh 0;
@@ -65,7 +70,7 @@
       height: 1vh;
       background-color: #f2f2f2;
       border-radius: 15px;
-      @media screen and (min-width: $horizontal-player-size) {
+      @media (orientation : landscape) {
         margin: 2vh 0;
       }
       .progress-bar {
@@ -96,7 +101,10 @@
       justify-content: space-between;
       align-items: center;
       width: var(--magic-width);
-      font-size: calc(var(--player-font-size));
+      font-size: var(--player-font-size);
+      @media(orientation: portrait) {
+        font-size: calc(var(--player-font-size) * 1.5);
+      }
       color: $secondary-text-color;
       margin: 10vh auto;
       span {
@@ -104,18 +112,30 @@
         &.selected {
         color: $primary-selected-text-color;
           background-color: $highlight-color;
+          }
+        i {
+          display: flex;
+          flex-direction: column;
+          &.small {
+            font-size: calc(0.9* var(--player-font-size));
+          }
+          &.toggled::after {
+            content: '\00b7'; /* Unicode character for a middle dot */
+            position: absolute;
+            transform: translateY(0.4em) translateX(0.25em);
+          }
       }
       }
-      @media screen and (min-width: $horizontal-player-size) {
+      @media (orientation : landscape) {
         margin: 10vh 0;
       }
     }
   }
 
-  @media screen and (min-width: $horizontal-player-size) {
+  @media (orientation : landscape) {
     flex-direction: row;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     .image-container {
       margin-right: 2vw;
     }

@@ -1,11 +1,15 @@
 <div class="header">
 	<span class="item">
-		{{statusLogo}}
+		<ng-container *ngIf="(sharedService.getStackSize() > 1) && (sharedService.getDeviceType() == DeviceType.MOBILE)">
+      <span (click)="navigateBack()">
+        Back
+      </span>
+    </ng-container>
 	</span>
 	<span class="item">
 		{{title}}
 	</span>
 	<span class="item">
-		&nbsp;
+		{{statusLogo}}
 	</span>
 </div>
