@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { Location } from '@angular/common'
+import {Component, OnInit} from '@angular/core';
+import {Location} from '@angular/common'
 
-import { JellyfinService } from '../services/jellyfin.service';
-import { AudioService } from '../services/audio.service';
-import { SharedService } from '../services/shared.service';
+import {JellyfinService} from '../services/jellyfin.service';
+import {AudioService} from '../services/audio.service';
+import {DeviceType, SharedService} from '../services/shared.service';
 
 
-import { TrackItem } from '../listView/list-item.model';
+import {BaseListItem, BaseListItemType, TrackItem} from '../models/list-item.model';
 import {KeyboardHelper} from '../helpers/keyboard.helper'
+import {Observable} from "rxjs";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-player',
@@ -15,90 +17,144 @@ import {KeyboardHelper} from '../helpers/keyboard.helper'
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent extends KeyboardHelper implements OnInit {
-  playingTrack: TrackItem = new TrackItem("0", "Unknown", "Unknown", false);
-  
-  timeElapsed : string = "--";
-  timeRemaining : string = "--";
-  progressBarWidth : string = "0%";
-  trackName : string = "";
-  artistName : string = "";
-  imageUrl : string = "";
-  defaultImageUrl : string = "../../assets/images/album.png";
-  playlistIndex = "";
-  
+
+  currentTrack! : Observable<TrackItem>;
+
+  public controlsList : BaseListItem[] = [];
+  public controlsIndex = 2;
+
 
   constructor(
     private jellyfinService: JellyfinService,
     protected audioService: AudioService,
     protected sharedService : SharedService,
     protected location: Location,
+    protected router: Router
     ) {
     super();
+    this.currentTrack = this.audioService.getCurrentTrackObservable();
   }
-
   ngOnInit(): void {
     this.sharedService.setTitle("Now Playing");
+    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC, "0", "queue", "icon-list", 0 == this.controlsIndex, true));
+    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC, "1", "previous", "icon-previous", 1 == this.controlsIndex, true));
+    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC,"2", "play-pause", "icon-spinner staggered-spin", 2 == this.controlsIndex, true));
+    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC,"3", "next", "icon-next", 3 == this.controlsIndex, true));
+    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC,"4", "shuffle", "icon-shuffle" + (this.audioService.shuffle ? " toggled" : ""), 4 == this.controlsIndex, true));
 
-    this.audioService.getTimeRemaining().subscribe(timeRemaining => {
-      this.timeRemaining = timeRemaining;
-    });
-
-    this.audioService.getTimeElapsed().subscribe(timeElapsed => {
-      this.timeElapsed = timeElapsed;
-    });
-    this.audioService.getPercentElapsed().subscribe(percentElapsed => {
-      this.progressBarWidth = `${percentElapsed}%`;
-    });
-    this.audioService.getTrackName().subscribe(trackName => {
-      this.trackName = trackName;
-    });
-    this.audioService.getArtistName().subscribe(artistName => {
-      this.artistName = artistName;
-    });
-    this.audioService.getAlbumImageUrl().subscribe(imageUrl => {
-      this.imageUrl = imageUrl;
-    });
-    
 
     this.audioService.getPlaylistIndex().subscribe(playlistIndex => {
-      this.playlistIndex = playlistIndex;
-      if (this.playlistIndex != "1 of 1") {
-        this.left_button_label = "Prev";
-        this.right_button_label = "Next";
+      if (playlistIndex === "1 of 1") {
+        this.controlsList.splice(0, 2);
+        this.controlsList.splice(1, 2);
       }
     });
 
-    this.audioService.getPlayerStatus().subscribe(status => {
-      if(status === "playing") {
-        this.middle_button_label = "Pause";  
-      } else if (status === "paused") {
-        this.middle_button_label = "Play";  
-      } else {
-        this.middle_button_label = status;
-      }
-      
-    });
+    const playButton = this.controlsList.find(obj => obj.id === "2");
+    if (playButton) {
+      this.audioService.getPlayerStatus().subscribe(status => {
+        let subtitle = '';
+        switch (status) {
+          case "playing":
+            subtitle = "icon-pause";
+            this.jellyfinService.startSessionPlayback(this.getCurrentTrackId());
+            break;
+          case "paused":
+            subtitle = "icon-play";
+            this.jellyfinService.startSessionPlayback(this.getCurrentTrackId(), true);
+            break;
+          case "stopped":
+            subtitle = "icon-stop";
+            this.jellyfinService.stopSessionPlayback(this.getCurrentTrackId());
+            break;
+          case "loading":
+            subtitle = "icon-spinner staggered-spin";
+            break;
+          default:
+            subtitle = "icon-spinner";
+            break;
+        }
+        playButton.subtitle = subtitle;
+      });
+    }
+
   }
+  // Add this method to get the current track's ID
+  private getCurrentTrackId(): string {
+    let currentTrackId: string = '';
+    const subscription = this.audioService.getCurrentTrackObservable().subscribe(track => {
+      if (track) {
+        currentTrackId = track.id;
+      }
+    });
 
+    return currentTrackId;
+  }
   handleSoftLeftButton() {
     this.audioService.playPreviousAudio();
   }
   handleSoftRightButton() {
     this.audioService.playNextAudio();
-
   }
   handleCenterButton() {
-    this.audioService.toggleAudio();
+    switch (this.controlsIndex) {
+      case 0 :
+        this.sharedService.updateViewIndexHistory({index: this.controlsIndex, totalItems : this.controlsList.length, scrollTop : 0})
+        this.router.navigate(['/queue']);
+        return;
+      case 1 :
+        this.audioService.playPreviousAudio();
+        return;
+      case 2 :
+        this.audioService.toggleAudio();
+        return;
+      case 3 :
+        this.audioService.playNextAudio();
+        return;
+        case 4 :
+          this.audioService.toggleShuffle()
+          this.controlsList[this.controlsIndex].subtitle = "icon-shuffle " + (this.audioService.shuffle ? "toggled" : "");
+    }
   }
   handleUpButton() {}
   handleDownButton() {}
   handleBackButton() {
-    this.location.back();
+    if (this.sharedService.getStackSize() > 1) {
+      this.sharedService.popViewIndex();
+      this.location.back();
+    }
   }
- 
-  onImageError() {
-    this.imageUrl = this.defaultImageUrl;
+  handleRightButton() {
+    this.playClickSound();
+    // Your row selection code
+    this.controlsList[this.controlsIndex].selected = false;
+    if (this.controlsIndex+1 < this.controlsList.length) {
+      this.controlsIndex++
+    } else {
+      this.controlsIndex = 0;
+    }
+    this.controlsList[this.controlsIndex].selected = true;
   }
-  
-  
+  handleLeftButton() {
+    this.playClickSound();
+    // Your row selection code
+    this.controlsList[this.controlsIndex].selected = false;
+
+    if (this.controlsIndex == 0) {
+      this.controlsIndex = this.controlsList.length-1
+    } else {
+      this.controlsIndex--;
+    }
+    this.controlsList[this.controlsIndex].selected = true;
+  }
+
+  clickItem(item: BaseListItem) {
+    this.playClickSound();
+    this.controlsList[this.controlsIndex].selected = false;
+    this.controlsIndex = this.controlsList.indexOf(item);
+    this.controlsList[this.controlsIndex].selected = true;
+    this.handleCenterButton();
+  }
+
+  protected readonly DeviceType = DeviceType;
 }

@@ -1,26 +1,28 @@
-<div class="now-playing-container">
+<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.98), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.98)),url(' + (currentTrack | async)?.backdropImage + ')'">
   <div class="image-container">
     <div class="album-image">
-      <img [src]="imageUrl" (error)="onImageError()" />
+      <img [src]="(currentTrack | async)?.imageURL"/>
     </div>
   </div>
   <div class="progress-info-container">
     <div class="now-playing-info">
-      <h2 *ngIf="playlistIndex !== '1 of 1'" class="now-playing-artist">{{ playlistIndex }}</h2>
-      <h1 class="now-playing-title">{{ trackName }}</h1>
-      <h2 class="now-playing-artist">{{ artistName }}</h2>
+      <span *ngIf="(audioService.getPlaylistIndex() | async) !== '1 of 1'" class="now-playing-artist">{{ audioService.getPlaylistIndex() | async }}</span>
+      <h3 class="now-playing-title">{{ (currentTrack | async)?.title }}</h3>
+      <span class="now-playing-artist">{{ (currentTrack | async)?.albumArtists }}</span>
     </div>
     <div class="progress-container">
-    <div class="progress-bar" [style.width]="progressBarWidth"></div>
-    <div class="time-display">
-      <div class="current-time">{{timeElapsed}}</div>
-      <div class="duration">{{timeRemaining}}</div>
+    <div class="load-bar" [style.width]="(audioService.getPercentLoaded() | async) + '%'"></div>
+    <div class="progress-bar" [style.width]="(audioService.getPercentElapsed() | async) + '%'"></div>
+      <div class="time-display small">
+      <div class="current-time">{{ audioService.getTimeElapsed() | async }}</div>
+      <div class="duration">{{ audioService.getTimeRemaining() | async }}</div>
     </div>
   </div>
-  </div>
-  <div class="footer-controls">
-    <span class="footer-button">{{left_button_label}}</span>
-    <span class="footer-button">{{middle_button_label}}</span>
-    <span class="footer-button">{{right_button_label}}</span>
+    <div class ="controls-container">
+       <span *ngFor="let item of controlsList" class="list-item" [class.selected]="item.selected" [class.large]="sharedService.isDeviceMobile()" (click)="clickItem(item)">
+         <i [class]="item.subtitle"></i>
+       </span>
+
+    </div>
   </div>
 </div>

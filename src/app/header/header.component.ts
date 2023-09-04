@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { AudioService } from '../services/audio.service';
-import { SharedService } from '../services/shared.service';
+import {DeviceType, SharedService} from '../services/shared.service';
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'app-header',
@@ -9,11 +10,11 @@ import { SharedService } from '../services/shared.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
-   
+
   statusLogo : string = "";
   title: string = '';
 
-  constructor(private audioService: AudioService, private sharedService : SharedService) {}
+  constructor(private audioService: AudioService, public sharedService : SharedService, public location : Location) {}
 
   ngOnInit(): void {
     this.audioService.getPlayerStatus().subscribe(status => {
@@ -43,4 +44,12 @@ export class HeaderComponent implements OnInit {
     });
   }
 
+  protected navigateBack() {
+    if (this.sharedService.getStackSize() > 1) {
+      this.sharedService.popViewIndex();
+      this.location.back();
+    }
+  }
+
+  protected readonly DeviceType = DeviceType;
 }

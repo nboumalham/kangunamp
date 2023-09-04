@@ -1,0 +1,77 @@
+@import '../../../assets/themes/default';
+@import '../item.component';
+
+div.grid-container {
+  display: grid;
+  height: var(--container-height);
+  width: 100vw;
+  gap: 0px; // Adjust the gap between cards as needed
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background-color: $background-color;
+}
+
+div.grid-item {
+  width: 100%;
+  max-height: 40vh;
+  text-align: center;
+  //font-size: $list-item-font-size;
+  padding: 0;
+  border: 0px;
+  display: flex;
+  flex-grow: 1;
+  color: $primary-text-color;
+
+  &.selected {
+    background-color: $highlight-color;
+    color: $primary-selected-text-color;
+    div.image {
+      transform: scale(1.15);
+      transition: transform 0.4s ease;
+    }
+  }
+  &:not(.selected) {
+    div.image {
+      transform: scale(1); /* Reset the scale to its original size */
+      transition: transform 0.3s ease;
+    }
+  }
+div.card {
+  width: 100%;
+  padding: 3vh 0 0 0;
+
+
+  div.image {
+    margin: auto;
+    border: 1px solid #DDD;
+    --magic-width: calc(min(25vw, 25vh));
+    width: var(--magic-width);
+    height: var(--magic-width);
+    max-width: 80%;
+    overflow: hidden;
+    img {
+      height: 100%;
+      margin: auto;
+    }
+  }
+  p.name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding : 5% 8%;
+    height: $item-font-size;
+  }
+
+  p.description {
+    //font-size: $list-item-font-size;
+    color: $secondary-text-color;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  p.icon {
+    margin: auto;
+  }
+}
+}

@@ -1,17 +1,30 @@
+@import './assets/themes/default.scss';
+@import './assets/font-icons/icons.scss';
+
 body {
 	margin: 0;
 	font-family: 'iPod';
+  background-color: $background-color;
+  overflow: hidden;
+  user-select: none;
+  font-size: $item-font-size;
 
-	h1 {
-		font-size: 1.5em;
-		margin: 0.5em 0;
+  h1 {
+    font-size: calc($item-font-size * 10);
+		margin: 2vh 0;
 	}
+  h2 {
+    font-size: calc($item-font-size * 1.5);
+  }
+  h3 {
+    font-size: calc($item-font-size * 1.1);
 
+  }
 	ul {
 		margin:0;
    		padding: 0;
    		text-indent: 0;
-	
+
 	li {
 		list-style-type: none;
 		margin:0;
@@ -27,56 +40,32 @@ body {
 	}
 }
 
-  .footer-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    height: 10vh;
-    position: absolute;
-    bottom: 0;
-    background-color: #f2f2f2;
+  .small {
+    font-size: calc($item-font-size * 0.6);
+  }
 
-    .footer-button {
-      background-color: transparent;
-      border: none;
-      outline: none;
-      font-size: 5vh;
-      color: #333;
-      margin: 0 10px;
-      cursor: pointer;
+  .large {
+    font-size: calc($item-font-size * 2);
+  }
+  img {
+    opacity: 0;
+    transition: opacity 400ms ease-in-out; /* Adjust duration and easing as needed */
+    &.loaded {
+      opacity: 1;
+    } &.not-loaded {
+      opacity: 1;
     }
   }
 
+  // Define variables for default values
+  --header-height: 5vh;
+  --container-height: calc(100vh - var(--header-height));
+  --header-color: transparent;
 
-  //Icons
+  @media (orientation: portrait) {
+    --header-height: min(9vh, 15vw);
+    --container-height: calc(100vh - var(--header-height));
+    --header-color: #914CB4;
+  }
 
-      i.icon {
-      display: inline-block;
-      width: 15px; /* Set the width and height of the logo */
-      height: 15px;
-      background-size: contain; /* Scale the logo to fit within the width and height of the <i> tag */
-      background-repeat: no-repeat; /* Prevent the logo from repeating */
-        &.playing {
-          background-image : url("/assets/images/playing.png");
-        }
-        &.paused {
-          background-image : url("/assets/images/paused.png");
-        }
-        &.loading {
-          background-image : url("/assets/images/loading.png");
-        }
-        &.right_arrow_black {
-          background-image : url("/assets/images/right_arrow_black.png");
-          width: 15px; /* Set the width and height of the logo */
-          height: 10px;
-          margin: 10px;
-        }
-        &.right_arrow_white {
-          background-image : url("/assets/images/right_arrow_white.png");
-          width: 15px; /* Set the width and height of the logo */
-          height: 10px;
-          margin: 10px;
-        }   
-      }
 }

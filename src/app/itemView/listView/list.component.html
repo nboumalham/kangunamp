@@ -1,0 +1,18 @@
+<ul class="list-container" #container>
+	<li *ngFor="let item of itemList" class="list-item" [class.selected]="(item.selected) && (!sharedService.isDeviceMobile())" (click)="selectItem(item)" (mousemove)="mouseEnter(item)">
+    <ng-container *ngIf="showThumbnails">
+      <span class="thumbnail-placeholder" [class.animated-background]="loading">
+        <ng-container *ngIf="!loading">
+          <img class="thumbnail" [src]="item.imageURL"/>
+        </ng-container>
+      </span>
+    </ng-container>
+    <p class="name">{{item.title}}</p>
+      	<ng-container *ngIf="item.subtitle.length > 0">
+      		<p class="description">{{item.subtitle}}</p>
+      	</ng-container>
+		<ng-container *ngIf="item.hasChild">
+			<p class="icon">›</p>
+  		</ng-container>
+  </li>
+</ul>

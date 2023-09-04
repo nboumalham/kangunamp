@@ -1,0 +1,12 @@
+<div class="grid-container" [ngStyle]="{'grid-template-columns': getColumnTemplate()}" #container>
+  <div *ngFor="let item of itemList" class="grid-item" [ngStyle]="{'width': getColumnWidth()}" [class.selected]="item.selected && !sharedService.isDeviceMobile()" (click)="selectItem(item)" (mousemove)="mouseEnter(item)">
+    <div class="card">
+      <div class="image" [class.animated-background]="loading">
+        <ng-container *ngIf="!loading">
+            <img [src]="item.imageURL"/>
+        </ng-container>
+      </div>
+      <p class="name small">{{ item.title }}</p>
+    </div>
+  </div>
+</div>

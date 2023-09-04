@@ -1,0 +1,24 @@
+.animated-background {
+  background: $background-color;
+  animation-name: color;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  margin: 1vw 1vh;
+
+}
+
+@keyframes color {
+  0% {
+    background: $background-color;
+  }
+  50% {
+    background: lighten($background-color, 20%);
+  }
+  100% {
+    background: $background-color;
+  } }
+
+
+
+

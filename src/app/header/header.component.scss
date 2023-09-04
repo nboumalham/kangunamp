@@ -1,17 +1,18 @@
 @import '../../assets/themes/default.scss';
 
 div.header {
-	margin: 0px 2px;
-	border-bottom: 0.5vh solid $primary-text-color;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 9.5vh;
+	margin: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--header-height);
+  background-color: var(--header-color);
 
-    span.item {
+
+  span.item {
       border: none;
       outline: none;
-      font-size: 5vh;
+      //font-size: 3vh;
       color: $primary-text-color;
       overflow: hidden;
       text-align: center;
@@ -20,7 +21,6 @@ div.header {
       	padding-left: 10px;
         text-align: left;
         width: 20vw;
-        font-family: initial;
       }
       &:last-child {
       	text-align: right;

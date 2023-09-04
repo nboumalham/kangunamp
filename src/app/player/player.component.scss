@@ -1,28 +1,39 @@
 @import '../../assets/themes/default.scss';
 
 .now-playing-container {
-  --magic-width: calc(min(80vw, 50vh));
-  --player-font-size: 5vh;
-  $horizontal-player-size: calc(120vh);
-  height: calc(80vh);
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  --magic-width: calc(min(45vw, 80vh));
+  @media (orientation : portrait) {
+    --magic-width: calc(min(95vw, 45vh));
+  }
+
+
+  //--player-font-size: min(4vh, 8vw);
+  $horizontal-player-size: calc(101vh);
+  height: var(--container-height);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
+
   .image-container {
     .album-image {
       width: var(--magic-width);
       height: var(--magic-width);
       margin-top: 4px;
       overflow: hidden;
+      perspective: 800px;
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
     }
-    @media screen and (min-width: $horizontal-player-size) {
+    @media (orientation : landscape) {
       margin: auto;
     }
   }
@@ -30,16 +41,16 @@
   .progress-info-container {
     text-align: center;
     margin-top: 2vh;
-    width: 80vw;
-    @media screen and (min-width: $horizontal-player-size) {
+    width: var(--magic-width);
+    @media (orientation : landscape) {
       width: 40vw;
-      margin: auto;
-      margin-left: 0px;
+      margin: auto auto auto 0;
       text-align: left;
     }
     .now-playing-info {
+      display: block;
       .now-playing-title, .now-playing-artist {
-        font-size: var(--player-font-size);
+        //font-size: var(--player-font-size);
         margin: 0.2vh 0;
         white-space: nowrap;
         overflow: hidden;
@@ -49,7 +60,7 @@
       }
       .now-playing-artist {
         color: $secondary-text-color;
-        font-size: calc(var(--player-font-size) * 0.8);
+        //font-size: calc(var(--player-font-size) * 0.8);
       }
     }
 
@@ -57,14 +68,21 @@
       margin: 2vh auto;
       width: var(--magic-width);
       height: 1vh;
-      background-color: #f2f2f2;
+      background-color: darken(#ffffff, 20%);
       border-radius: 15px;
-    @media screen and (min-width: $horizontal-player-size) {
-      margin: 2vh 0;
-    }
+      @media (orientation : landscape) {
+        margin: 2vh 0;
+      }
       .progress-bar {
         height: 100%;
-        background-color: $highlight-color;
+        background-color: $primary-active-color;
+        transition: width 0.1s ease-in-out;
+        border-radius: 15px;
+        transform: translateY(-1vh);
+      }
+      .load-bar {
+        height: 100%;
+        background-color: #ffffff;
         transition: width 0.1s ease-in-out;
         border-radius: 15px;
       }
@@ -75,7 +93,7 @@
       justify-content: space-between;
       align-items: center;
       width: var(--magic-width);
-      font-size: calc(var(--player-font-size) * 0.6);
+      //font-size: calc(var(--player-font-size) * 0.6);
       color: $primary-text-color;
       .current-time {
         float: left;
@@ -84,12 +102,40 @@
         float: right;
       }
     }
+
+    .controls-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: var(--magic-width);
+      color: $secondary-text-color;
+      margin: 10vh auto;
+      span {
+        margin: 0 auto;
+        &.selected {
+        color: $primary-selected-text-color;
+          background-color: $highlight-color;
+          }
+        i {
+          display: flex;
+          flex-direction: column;
+          &.toggled::after {
+            content: '\00b7'; /* Unicode character for a middle dot */
+            position: absolute;
+            transform: translateY(0.4em) translateX(0.25em);
+          }
+      }
+      }
+      @media (orientation : landscape) {
+        margin: 10vh 0;
+      }
+    }
   }
 
-  @media screen and (min-width: $horizontal-player-size) {
+  @media (orientation : landscape) {
     flex-direction: row;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     .image-container {
       margin-right: 2vw;
     }
