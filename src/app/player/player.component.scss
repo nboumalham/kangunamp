@@ -12,7 +12,7 @@
   }
 
 
-  --player-font-size: min(4vh, 8vw);
+  //--player-font-size: min(4vh, 8vw);
   $horizontal-player-size: calc(101vh);
   height: var(--container-height);
   display: flex;
@@ -50,7 +50,7 @@
     .now-playing-info {
       display: block;
       .now-playing-title, .now-playing-artist {
-        font-size: var(--player-font-size);
+        //font-size: var(--player-font-size);
         margin: 0.2vh 0;
         white-space: nowrap;
         overflow: hidden;
@@ -60,7 +60,7 @@
       }
       .now-playing-artist {
         color: $secondary-text-color;
-        font-size: calc(var(--player-font-size) * 0.8);
+        //font-size: calc(var(--player-font-size) * 0.8);
       }
     }
 
@@ -68,7 +68,7 @@
       margin: 2vh auto;
       width: var(--magic-width);
       height: 1vh;
-      background-color: #f2f2f2;
+      background-color: darken(#ffffff, 20%);
       border-radius: 15px;
       @media (orientation : landscape) {
         margin: 2vh 0;
@@ -76,6 +76,13 @@
       .progress-bar {
         height: 100%;
         background-color: $primary-active-color;
+        transition: width 0.1s ease-in-out;
+        border-radius: 15px;
+        transform: translateY(-1vh);
+      }
+      .load-bar {
+        height: 100%;
+        background-color: #ffffff;
         transition: width 0.1s ease-in-out;
         border-radius: 15px;
       }
@@ -86,7 +93,7 @@
       justify-content: space-between;
       align-items: center;
       width: var(--magic-width);
-      font-size: calc(var(--player-font-size) * 0.6);
+      //font-size: calc(var(--player-font-size) * 0.6);
       color: $primary-text-color;
       .current-time {
         float: left;
@@ -101,10 +108,6 @@
       justify-content: space-between;
       align-items: center;
       width: var(--magic-width);
-      font-size: var(--player-font-size);
-      @media(orientation: portrait) {
-        font-size: calc(var(--player-font-size) * 1.5);
-      }
       color: $secondary-text-color;
       margin: 10vh auto;
       span {
@@ -116,9 +119,6 @@
         i {
           display: flex;
           flex-direction: column;
-          &.small {
-            font-size: calc(0.9* var(--player-font-size));
-          }
           &.toggled::after {
             content: '\00b7'; /* Unicode character for a middle dot */
             position: absolute;

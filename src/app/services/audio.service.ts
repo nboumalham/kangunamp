@@ -73,12 +73,9 @@ export class AudioService {
             artist: track.albumArtists,
             album: track.album,
             artwork: [
-              { src: track.imageURL + "?fillWidth=96&fillHeight=96&quality=90", sizes: '96x96', type: 'image/jpeg' },
               { src: track.imageURL + "?fillWidth=128&fillHeight=128&quality=90", sizes: '128x128', type: 'image/jpeg' },
-              { src: track.imageURL + "?fillWidth=192&fillHeight=192&quality=90", sizes: '192x192', type: 'image/jpeg' },
-              { src: track.imageURL + "?fillWidth=256&fillHeight=256&quality=90", sizes: '256x256', type: 'image/jpeg' },
-              { src: track.imageURL + "?fillWidth=384&fillHeight=384&quality=90", sizes: '384x384', type: 'image/jpeg' },
               { src: track.imageURL + "?fillWidth=512&fillHeight=512&quality=90", sizes: '512x512', type: 'image/jpeg' },
+              { src: track.imageURL + "?fillWidth=1024&fillHeight=1024&quality=90", sizes: '1024x1024', type: 'image/jpeg'}
             ]
           });
         }
@@ -101,6 +98,14 @@ export class AudioService {
         navigator.mediaSession.setActionHandler('nexttrack', () => {
           // Handle pause action
           this.playNextAudio();
+        });
+        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+          // Handle pause action
+          this.seekAudioBackwards(details.seekOffset);
+        });
+        navigator.mediaSession.setActionHandler('seekforward', (details) => {
+          // Handle pause action
+          this.seekAudioForward(details.seekOffset);
         });
       }
     }
@@ -243,6 +248,14 @@ export class AudioService {
      public seekAudio(position: number): void {
          this.audio.currentTime = position;
      }
+
+  public seekAudioForward(delta: number = 100): void {
+    this.audio.currentTime += delta;
+  }
+
+  public seekAudioBackwards(delta: number = 100): void {
+    this.audio.currentTime -= delta;
+  }
 
     /**
      * This formats the audio's elapsed time into a human readable format, could be refactored into a Pipe.

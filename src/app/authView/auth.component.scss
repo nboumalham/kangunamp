@@ -6,12 +6,11 @@
 	display: flex;
   	justify-content: center;
   	align-items: center;
-  	font-size: 5vh;
   	color : $primary-text-color;
-	div.code {
-		font-size: min(60vh, 20vw);
-		margin: auto;
-		display: block;
-		color : $primary-selected-text-color;
-	}
+	  h1.code {
+		  margin: auto;
+		  display: block;
+		  color : $primary-selected-text-color;
+      font-size: 24vw;
+    }
 }

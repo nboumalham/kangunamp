@@ -14,9 +14,9 @@
 	li.list-item {
     cursor: pointer;
     $list-item-height: min(9vh, 15vw);
-		$list-item-font-size: min(4vh, 15vw);
+		//$list-item-font-size: min(3vh, 15vw);
 		text-align: left;
-		font-size: $list-item-font-size;
+		//font-size: $list-item-font-size;
 		width: 100%;
 		height: $list-item-height;
     line-height: $list-item-height;
@@ -29,7 +29,7 @@
     @media (orientation: portrait) {
       border-bottom: 1px solid $divider-color;
     }
-		&.selected {
+		&.selected, &:active   {
 			background-color: $highlight-color;
 			color: $primary-selected-text-color;
       span.thumbnail-placeholder {
@@ -58,18 +58,18 @@
 			padding: 0 0 0 10px;
 			white-space: nowrap;
 			overflow: hidden;
-    		text-overflow: ellipsis;
-    		max-width: 70vw;
-        margin-right: auto;
+      text-overflow: ellipsis;
+      width: 65vw;
+      margin-right: auto;
 		}
 		p.description {
-			font-size: $list-item-font-size;
+			//font-size: $list-item-font-size;
 			color: $secondary-text-color;
   			margin-left: auto;
 			padding: 0 10px 0 0;
 			white-space: nowrap;
-			overflow: hidden;
-      text-overflow: ellipsis;
+			//overflow: hidden;
+      //text-overflow: ellipsis;
       margin-right: 0px;
     }
 		p.icon {

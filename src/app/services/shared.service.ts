@@ -1,39 +1,52 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+
+export class IndexHistory {
+  index! : number;
+  totalItems! : number;
+  scrollTop! : number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class SharedService {
-
-  public selectedIndexes: number[] = [0];
+  public selectedIndexHistory : IndexHistory[] = [{index: 0, totalItems: 0, scrollTop: 0}];
   private title = new BehaviorSubject<string>('Jellypod');
   private _breakpoint : number = 0;
 
   getCurrentIndex() {
-    return this.selectedIndexes.slice(-1)[0];
+    return this.selectedIndexHistory.slice(-1)[0].index;
   }
 
-  updateViewIndex(index: number, childIndex: number = 0): void{
-
-    this.selectedIndexes = this.selectedIndexes.slice(0, -1);
-    this.selectedIndexes.push(index);
-
-    if (childIndex !== undefined) {
-      this.selectedIndexes.push(childIndex);
-    }
+  getCurrenScroll() {
+    return this.selectedIndexHistory.slice(-1)[0].scrollTop;
   }
 
+  getCurrentTotalItems() {
+    return this.selectedIndexHistory.slice(-1)[0].totalItems;
+  }
+
+  updateViewIndexHistory(currentIndex: IndexHistory, childIndex: IndexHistory = {index:0, totalItems:0, scrollTop:0}): void{
+
+    this.selectedIndexHistory = this.selectedIndexHistory.slice(0, -1);
+    this.selectedIndexHistory.push(currentIndex);
+    this.selectedIndexHistory.push(childIndex);
+  }
 
 
   popViewIndex() : number {
-    this.selectedIndexes = this.selectedIndexes.slice(0, -1);
+    this.selectedIndexHistory = this.selectedIndexHistory.slice(0,-1);
     return this.getStackSize();
   }
 
-  getStackSize() : number {
-    return this.selectedIndexes.length
+  resetViewIndex() : void {
+    this.selectedIndexHistory = [{index:0, scrollTop: 0, totalItems: 0}];
   }
 
+  getStackSize() : number {
+    return this.selectedIndexHistory.length;
+  }
 
   getTitle() {
     return this.title.asObservable();
@@ -53,6 +66,36 @@ export class SharedService {
 
   getDeviceType() {
     return this._breakpoint > 2 ? DeviceType.DESKTOP : DeviceType.MOBILE;
+  }
+
+  isDeviceMobile() : boolean {
+    return this.getDeviceType() == DeviceType.MOBILE
+}
+
+  public getDeviceId(): string {
+    let deviceId = localStorage.getItem('jellyfin_device_id');
+    if (!deviceId) {
+      deviceId = this.generateUUID();
+      localStorage.setItem('jellyfin_device_id', deviceId);
+    }
+    return deviceId;
+  }
+
+  private generateUUID(): string {
+    let d = new Date().getTime();
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      // tslint:disable-next-line:no-bitwise
+      const r = ((d + Math.random() * 16) % 16) | 0;
+      d = Math.floor(d / 16);
+      // tslint:disable-next-line:no-bitwise
+      return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+    });
+    return uuid;
+  }
+
+  public getDeviceName(): string {
+    //TODO: get device name from device for now just return a static name
+    return "Kangunamp";
   }
 }
 

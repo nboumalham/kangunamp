@@ -9,24 +9,24 @@ import {SharedService} from "../services/shared.service";
 
 export interface ListConfig {
   title : string;
-  fetchList: (selectedIndex?: number, parentId?: string) => Promise<BaseListItem[]>;
+  fetchList: (parentId?: string) => Promise<BaseListItem[]>;
   onSelectItem: (item: BaseListItem, items? : BaseListItem[]) => void;
 }
 
 export const homeViewConfig = (router: Router, audioService: AudioService): ListConfig => ({
   title: "Kangunamp",
 
-  fetchList: async (selectedIndex?: number): Promise<BaseListItem[]> => {
+  fetchList: async (): Promise<BaseListItem[]> => {
     const items: BaseListItem[] = [
-      new BaseListItem(BaseListItemType.GENERIC, "0", "Artists", "", 0 === selectedIndex, true),
-      new BaseListItem(BaseListItemType.GENERIC, "1", "Albums", "", 1 === selectedIndex, true),
-      new BaseListItem(BaseListItemType.GENERIC, "2", "Playlists", "", 2 === selectedIndex, true),
-      new BaseListItem(BaseListItemType.GENERIC, "3", "Settings", "", 3 === selectedIndex, true),
+      new BaseListItem(BaseListItemType.GENERIC, "0", "Artists", "",false,true),
+      new BaseListItem(BaseListItemType.GENERIC, "1", "Albums", "",false,true),
+      new BaseListItem(BaseListItemType.GENERIC, "2", "Playlists", "",false, true),
+      new BaseListItem(BaseListItemType.GENERIC, "3", "Settings", "",false, true),
     ];
 
     audioService.getPlayerStatus().subscribe((status) => {
       if ((status !== "stopped") && (items.findIndex(item => item.title === "Now Playing") === -1)) {
-          items.push(new BaseListItem(BaseListItemType.GENERIC, "4", "Now Playing", "", 4 === selectedIndex,));
+          items.push(new BaseListItem(BaseListItemType.GENERIC, "4", "Now Playing", "", false,));
       }
     });
     return items;
@@ -45,18 +45,18 @@ export const homeViewConfig = (router: Router, audioService: AudioService): List
     } else if (item.title === "Playlists") {
       router.navigate(['playlists'], navigationExtras);
     } else if (item.title === "Settings") {
-      router.navigate(['settings']);
+      router.navigate(['settings'], navigationExtras);
     } else if (item.title === "Now Playing") {
-      router.navigate(['player']);
+      router.navigate(['player'], navigationExtras);
     }
   },
 });
 
 export const settingsViewConfig = (router: Router, jellyfinService: JellyfinService): ListConfig => ({
   title: "Settings",
-  fetchList: async (selectedIndex?: number): Promise<BaseListItem[]> => {
+  fetchList: async (): Promise<BaseListItem[]> => {
     const items: BaseListItem[] = [];
-    items.push(new BaseListItem(BaseListItemType.GENERIC, "0", "About", "", 0 === selectedIndex, true));
+    items.push(new BaseListItem(BaseListItemType.GENERIC, "0", "About", "", false, true));
     //items.push(new BaseListItem(BaseListItemType.GENERIC, "1", "Themes", "Light", 1 === selectedIndex, true));
     //items.push(new BaseListItem(BaseListItemType.GENERIC, "2", "Purge local cache", "", 2 === selectedIndex, false));
     return items;
@@ -75,9 +75,9 @@ export const settingsViewConfig = (router: Router, jellyfinService: JellyfinServ
 
 export const aboutViewConfig = (): ListConfig => ({
   title: "About",
-  fetchList: async (selectedIndex?: number): Promise<BaseListItem[]> => {
+  fetchList: async (): Promise<BaseListItem[]> => {
     const items: BaseListItem[] = [];
-    items.push(new BaseListItem(BaseListItemType.GENERIC, "0", "Device", "Kangunamp", true));
+    items.push(new BaseListItem(BaseListItemType.GENERIC, "0", "Device", "Kangunamp", false));
     items.push(new BaseListItem(BaseListItemType.GENERIC, "1", "Copyright", "© 2023 NBM", false));
     items.push(new BaseListItem(BaseListItemType.GENERIC, "2", "OS version", "0.0.0.1", false));
     items.push(new BaseListItem(BaseListItemType.GENERIC, "3", "User id", `${localStorage.getItem('jellyfin_user_id')}`, false));
@@ -91,7 +91,7 @@ export const aboutViewConfig = (): ListConfig => ({
 });
 export const themesViewConfig = (): ListConfig => ({
   title: "Themes",
-  fetchList: async (selectedIndex?: number): Promise<BaseListItem[]> => {
+  fetchList: async (): Promise<BaseListItem[]> => {
     const items: BaseListItem[] = [];
     items.push(new BaseListItem(BaseListItemType.GENERIC, "0", "Light", "",true));
     items.push(new BaseListItem(BaseListItemType.GENERIC, "1", "Dark","", false));
@@ -105,12 +105,11 @@ export const themesViewConfig = (): ListConfig => ({
 
 export const artistsViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService): ListConfig => ({
   title: "Artists",
-  fetchList: async (selectedIndex?: number): Promise<BaseListItem[]> => {
+  fetchList: async (): Promise<BaseListItem[]> => {
     try {
       const artists = await lastValueFrom(jellyfinService.listArtists());
       return artists.map((artist: BaseListItem, index: number) => {
         artist.hasChild = true;
-        artist.selected = (index === selectedIndex);
         return artist;
       });
     } catch (error) {
@@ -133,13 +132,12 @@ export const artistsViewConfig = (router: Router, audioService: AudioService, je
 
 export const albumsViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService): ListConfig => ({
   title: "Albums",
-  fetchList: async (selectedIndex?: number, parentId?: string): Promise<BaseListItem[]> => {
+  fetchList: async (parentId?: string): Promise<BaseListItem[]> => {
     try {
       const albums : any = await lastValueFrom(jellyfinService.listAlbums(parentId));
 
       return albums.map((album: BaseListItem, index: number) => {
-        album.hasChild = true;
-        album.selected = (index === selectedIndex);
+        album.hasChild = true
         return album;
       });
     } catch (error) {
@@ -160,13 +158,12 @@ export const albumsViewConfig = (router: Router, audioService: AudioService, jel
 
 export const playlistViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService): ListConfig => ({
   title: "Playlists",
-  fetchList: async (selectedIndex?: number, parentId?: string): Promise<BaseListItem[]> => {
+  fetchList: async (parentId?: string): Promise<BaseListItem[]> => {
     try {
       const albums =  await lastValueFrom(jellyfinService.listPlaylists());
 
       return albums.map((album: BaseListItem, index: number) => {
         album.hasChild = true;
-        album.selected = (index === selectedIndex);
         return album;
       });
     } catch (error) {
@@ -187,21 +184,20 @@ export const playlistViewConfig = (router: Router, audioService: AudioService, j
 
 export const tracksViewConfig = (router: Router, audioService: AudioService, jellyfinService : JellyfinService, albumOrArtistTracks : boolean = true): ListConfig => ({
   title: "Songs",
-  fetchList: async (selectedIndex?: number, parentId?: string): Promise<BaseListItem[]> => {
+  fetchList: async (parentId?: string): Promise<BaseListItem[]> => {
     try {
       const items: TrackItem[] = [];
 
       if (typeof parentId === 'string') {
         const tracks = await lastValueFrom((albumOrArtistTracks ? jellyfinService.listAlbumTracks(parentId) : jellyfinService.listArtistTracks(parentId)));
         tracks.forEach((track: TrackItem, index: number) => {
-          track.selected = (index === selectedIndex);
           items.push(track);
         });
       }
 
       return items;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return []; // Return an empty array in case of an error
     }
   },
@@ -240,7 +236,6 @@ export const queueTracksViewConfig = (location: Location, audioService: AudioSer
       const index = items.indexOf(item);
       audioService.currentAudioIndex = index-1;
       audioService.playNextAudio();
-      sharedService.popViewIndex();
       sharedService.popViewIndex();
       location.back();
     }

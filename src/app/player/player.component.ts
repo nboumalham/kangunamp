@@ -3,7 +3,7 @@ import {Location} from '@angular/common'
 
 import {JellyfinService} from '../services/jellyfin.service';
 import {AudioService} from '../services/audio.service';
-import {SharedService} from '../services/shared.service';
+import {DeviceType, SharedService} from '../services/shared.service';
 
 
 import {BaseListItem, BaseListItemType, TrackItem} from '../models/list-item.model';
@@ -36,11 +36,11 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   }
   ngOnInit(): void {
     this.sharedService.setTitle("Now Playing");
-    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC, "0", "queue", "icon-list small", 0 == this.controlsIndex, true));
+    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC, "0", "queue", "icon-list", 0 == this.controlsIndex, true));
     this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC, "1", "previous", "icon-previous", 1 == this.controlsIndex, true));
     this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC,"2", "play-pause", "icon-spinner staggered-spin", 2 == this.controlsIndex, true));
     this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC,"3", "next", "icon-next", 3 == this.controlsIndex, true));
-    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC,"4", "shuffle", "icon-shuffle small" + (this.audioService.shuffle ? " toggled" : ""), 4 == this.controlsIndex, true));
+    this.controlsList.push(new BaseListItem(BaseListItemType.GENERIC,"4", "shuffle", "icon-shuffle" + (this.audioService.shuffle ? " toggled" : ""), 4 == this.controlsIndex, true));
 
 
     this.audioService.getPlaylistIndex().subscribe(playlistIndex => {
@@ -99,7 +99,7 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   handleCenterButton() {
     switch (this.controlsIndex) {
       case 0 :
-        this.sharedService.updateViewIndex(0, this.audioService.currentAudioIndex)
+        this.sharedService.updateViewIndexHistory({index: this.controlsIndex, totalItems : this.controlsList.length, scrollTop : 0})
         this.router.navigate(['/queue']);
         return;
       case 1 :
@@ -113,7 +113,7 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
         return;
         case 4 :
           this.audioService.toggleShuffle()
-          this.controlsList[this.controlsIndex].subtitle = "icon-shuffle small " + (this.audioService.shuffle ? "toggled" : "");
+          this.controlsList[this.controlsIndex].subtitle = "icon-shuffle " + (this.audioService.shuffle ? "toggled" : "");
     }
   }
   handleUpButton() {}
@@ -155,4 +155,6 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     this.controlsList[this.controlsIndex].selected = true;
     this.handleCenterButton();
   }
+
+  protected readonly DeviceType = DeviceType;
 }

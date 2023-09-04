@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {catchError, map, Observable, startWith, throwError} from 'rxjs';
+import {catchError, map, Observable, skip, startWith, throwError} from 'rxjs';
 import {Router} from '@angular/router';
 import {PlaybackProgressInfo} from "./playback-progress-info";
 import {BaseListItem, BaseListItemType} from "../models/list-item.model";
+import {SharedService} from "./shared.service";
 
 
 @Injectable({
@@ -13,26 +14,31 @@ export class JellyfinService {
 
   baseURL = "https://media.boumalham.com/";
   client = "Kangunamp";
-  device = 'Kangunamp';
-  deviceId = "TW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0OyBydjo5NC4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzk0LjB8MTYzODA1MzA2OTY4Mw12";
+  device!: string;
+  deviceId!: string;
   version = "0.0.0.1";
-  headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'X-MediaBrowser-Token': '',
-    'X-Emby-Authorization': `MediaBrowser Client="${this.client}", Device="${this.device}", DeviceId="${this.deviceId}", Version="${this.version}"`,
-    'MediaBrowser': 'Music',
-    'Client': this.client,
-    'Device': this.device,
-    'DeviceId': this.deviceId,
-    'Version': this.version
-  });
+  headers!: HttpHeaders;
   /** LOCAL STORAGE **/
   private expirationTime = 3600000; // 1 hour in milliseconds
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router, private sharedService : SharedService) {
     // Check if the access token is still valid when the component is initialized
     const userIdToken = localStorage.getItem('jellyfin_user_id');
     const accessToken = localStorage.getItem('jellyfin_access_token');
+    //Instantiate all variables before chekcing Auth session
+    this.device = sharedService.getDeviceName();
+    this.deviceId = sharedService.getDeviceId();
+    this.headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-MediaBrowser-Token': '',
+      'X-Emby-Authorization': `MediaBrowser Client="${this.client}", Device="${this.device}", DeviceId="${this.deviceId}", Version="${this.version}"`,
+      'MediaBrowser': 'Music',
+      'Client': this.client,
+      'Device': this.device,
+      'DeviceId': this.deviceId,
+      'Version': this.version
+    });
+    //check Auth Session else redirect to authentication.
     if (accessToken && userIdToken) {
       console.log('checking access token ')
       this.checkAuth(accessToken, userIdToken);
@@ -168,8 +174,20 @@ export class JellyfinService {
   }
 
   getTrackStream(trackId: string): string {
-    const url = this.baseURL + `Audio/${trackId}/stream`;
-    const params = new HttpParams({fromObject: this.getBaseHttpParams()});
+    const url = this.baseURL + `Audio/${trackId}/universal`;
+    let baseParams: any= this.getBaseHttpParams();
+    let streamParams :any = {
+      MaxStreamingBitrate: 140000000,
+      Container: 'opus,webm|opus,mp3,aac,m4a|aac,m4b|aac,flac,webma,webm|webma,wav,ogg',
+      TranscodingContainer: 'ts',
+      TranscodingProtocol: 'hls',
+      AudioCodec: 'aac',
+      StartTimeTicks: 0,
+      EnableRedirection: true,
+      EnableRemoteMedia: false
+    };
+    const params = new HttpParams({fromObject: {...baseParams, ...streamParams}});
+    //append range to params so that it's compatible with safari and ios
     return url + '?' + params.toString();
   }
 

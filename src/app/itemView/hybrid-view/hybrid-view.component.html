@@ -1,6 +1,6 @@
-<ng-container *ngIf="sharedService.getDeviceType() == DeviceType.MOBILE">
+<ng-container *ngIf="sharedService.isDeviceMobile()">
   <item-list></item-list>
 </ng-container>
-<ng-container *ngIf="sharedService.getDeviceType() != DeviceType.MOBILE">
+<ng-container *ngIf="!sharedService.isDeviceMobile()">
   <item-grid></item-grid>
 </ng-container>

@@ -18,6 +18,7 @@ import { AudioQueueComponent } from './audio-queue/audio-queue.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { HybridViewComponent } from './itemView/hybrid-view/hybrid-view.component';
 import {LazyImageDirective} from "./directives/lazy-image.directive";
+import {PwaService} from "./services/pwa.service";
 
 @NgModule({
   declarations: [
@@ -45,7 +46,7 @@ import {LazyImageDirective} from "./directives/lazy-image.directive";
       registrationStrategy: 'registerWhenStable:30000'
     }),
   ],
-  providers: [AudioService],
+  providers: [AudioService, PwaService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

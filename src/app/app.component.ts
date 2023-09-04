@@ -1,7 +1,8 @@
-import {Component} from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 import {slideAnimation} from "./animations";
 import {ChildrenOutletContexts} from "@angular/router";
-import {DeviceType, SharedService} from "./services/shared.service";
+import {SharedService} from "./services/shared.service";
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'app-root',
@@ -13,11 +14,12 @@ import {DeviceType, SharedService} from "./services/shared.service";
 })
 export class AppComponent {
   title = 'kangunamp';
-  constructor(private contexts: ChildrenOutletContexts, private sharedService : SharedService) {}
+  constructor(private contexts: ChildrenOutletContexts, private sharedService : SharedService, private location : Location) {}
+
 
   getRouteAnimationData() {
     this.title = this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation']
-    return (this.sharedService.getDeviceType() != DeviceType.MOBILE ? this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'] : "inactive");
+    return (!this.sharedService.isDeviceMobile() ? this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'] : "inactive");
   }
 
   onResize(event: Event) {
