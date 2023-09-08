@@ -10,14 +10,15 @@
       <h3 class="now-playing-title">{{ (currentTrack | async)?.title }}</h3>
       <span class="now-playing-artist">{{ (currentTrack | async)?.albumArtists }}</span>
     </div>
-    <div class="progress-container">
-    <div class="load-bar" [style.width]="(audioService.getPercentLoaded() | async) + '%'"></div>
-    <div class="progress-bar" [style.width]="(audioService.getPercentElapsed() | async) + '%'"></div>
-      <div class="time-display small">
+    <div class="progress-container" (click)="onProgressClick($event)">
+      <div class="load-bar" [style.width]="(audioService.getPercentLoaded() | async) + '%'"></div>
+      <div class="progress-bar" [style.width]="(audioService.getPercentElapsed() | async) + '%'"></div>
+      <div class="circle-handle" appDraggable (dragend)="onDragEnd($event)" [style.margin-left]="(audioService.getPercentElapsed() | async) + '%'"></div>
+  </div>
+    <div class="time-display small">
       <div class="current-time">{{ audioService.getTimeElapsed() | async }}</div>
       <div class="duration">{{ audioService.getTimeRemaining() | async }}</div>
     </div>
-  </div>
     <div class ="controls-container">
        <span *ngFor="let item of controlsList" class="list-item" [class.selected]="item.selected" [class.large]="sharedService.isDeviceMobile()" (click)="clickItem(item)">
          <i [class]="item.subtitle"></i>

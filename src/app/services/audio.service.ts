@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {TrackItem} from "../models/list-item.model";
 
 @Injectable()
@@ -83,28 +83,22 @@ export class AudioService {
       if ('mediaSession' in navigator) {
         // Set media controls
         navigator.mediaSession.setActionHandler('play', () => {
-          // Handle play action
           this.playAudio();
         });
         navigator.mediaSession.setActionHandler('pause', () => {
-          // Handle pause action
           this.pauseAudio();
         });
         // More action handlers like next, prev, seekbackward, seekforward, etc.
         navigator.mediaSession.setActionHandler('previoustrack', () => {
-          // Handle pause action
           this.playPreviousAudio();
         });
         navigator.mediaSession.setActionHandler('nexttrack', () => {
-          // Handle pause action
           this.playNextAudio();
         });
         navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-          // Handle pause action
           this.seekAudioBackwards(details.seekOffset);
         });
         navigator.mediaSession.setActionHandler('seekforward', (details) => {
-          // Handle pause action
           this.seekAudioForward(details.seekOffset);
         });
       }
@@ -159,6 +153,7 @@ export class AudioService {
     public playNextAudio(): void {
         if (this.currentAudioIndex + 1 < this.audioQueue.length) {
             this.currentAudioIndex++;
+            this.pauseAudio();
             this.loadCurrentAudio();
         } else {
             this.currentAudioIndex = 0;
@@ -170,6 +165,7 @@ export class AudioService {
     public playPreviousAudio(): void {
         if (this.currentAudioIndex - 1 >= 0) {
             this.currentAudioIndex--;
+            this.pauseAudio();
             this.loadCurrentAudio();
         } else {
             this.currentAudioIndex = this.audioQueue.length - 1;
@@ -248,6 +244,11 @@ export class AudioService {
      public seekAudio(position: number): void {
          this.audio.currentTime = position;
      }
+
+  public seekAudioPercent(positionPercent: number): void {
+    // Calculate the new position in milliseconds
+    this.audio.currentTime = (this.audio.duration / 100) * positionPercent;
+  }
 
   public seekAudioForward(delta: number = 100): void {
     this.audio.currentTime += delta;

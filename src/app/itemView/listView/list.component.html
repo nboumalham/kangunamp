@@ -1,5 +1,5 @@
 <ul class="list-container" #container>
-	<li *ngFor="let item of itemList" class="list-item" [class.selected]="(item.selected) && (!sharedService.isDeviceMobile())" (click)="selectItem(item)" (mousemove)="mouseEnter(item)">
+  <li *ngFor="let item of itemList" class="list-item" [class.selected]="(item.selected) && (!sharedService.isDeviceMobile()  || item.type == BaseListItemType.QUEUE_TRACK)" (click)="selectItem(item)" (mousemove)="mouseEnter(item)">
     <ng-container *ngIf="showThumbnails">
       <span class="thumbnail-placeholder" [class.animated-background]="loading">
         <ng-container *ngIf="!loading">
@@ -8,10 +8,10 @@
       </span>
     </ng-container>
     <p class="name">{{item.title}}</p>
-      	<ng-container *ngIf="item.subtitle.length > 0">
+      	<ng-container *ngIf="item.subtitle">
       		<p class="description">{{item.subtitle}}</p>
       	</ng-container>
-		<ng-container *ngIf="item.hasChild">
+		<ng-container *ngIf="item.type !== BaseListItemType.TRACK && item.type !== BaseListItemType.ACTION">
 			<p class="icon">›</p>
   		</ng-container>
   </li>

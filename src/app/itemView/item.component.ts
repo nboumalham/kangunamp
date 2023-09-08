@@ -72,6 +72,10 @@ export abstract class ItemComponent extends KeyboardHelper implements OnInit, Af
         } else this.itemList.push(fetchedItem);
       });
       this.loading = false;
+      if(this.sharedService.getCurrenScroll() == 0)
+      {
+        this.scrollToSelected();
+      }
     });
   }
   protected getConfig(type: string): ListConfig {
@@ -107,7 +111,7 @@ export abstract class ItemComponent extends KeyboardHelper implements OnInit, Af
   protected selectItem(selectedItem?: BaseListItem | undefined) {
     if(this.loading) return;
     const item = selectedItem ?  selectedItem : this.itemList[this.index];
-    this.sharedService.updateViewIndexHistory({index: this.index, totalItems : this.itemList.length, scrollTop : this.container.nativeElement.scrollTop})
+    this.sharedService.updateViewIndexHistory({index: this.index, totalItems : this.itemList.length, scrollTop : this.container.nativeElement.scrollTop}, (item.hasChild ? {index: 0, totalItems: 0, scrollTop: 0} : undefined));
     this.config.onSelectItem(item, this.itemList);
   };
   protected nextItem() {

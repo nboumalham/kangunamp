@@ -27,11 +27,11 @@ export class SharedService {
     return this.selectedIndexHistory.slice(-1)[0].totalItems;
   }
 
-  updateViewIndexHistory(currentIndex: IndexHistory, childIndex: IndexHistory = {index:0, totalItems:0, scrollTop:0}): void{
+  updateViewIndexHistory(currentIndex: IndexHistory, childIndex?: IndexHistory): void{
 
     this.selectedIndexHistory = this.selectedIndexHistory.slice(0, -1);
     this.selectedIndexHistory.push(currentIndex);
-    this.selectedIndexHistory.push(childIndex);
+    if(childIndex) this.selectedIndexHistory.push(childIndex);
   }
 
 

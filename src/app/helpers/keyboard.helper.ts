@@ -1,8 +1,8 @@
-import {HostListener, Directive} from '@angular/core';
+import {HostListener, Directive, OnDestroy} from '@angular/core';
 
 @Directive({
 })
-export abstract class KeyboardHelper {
+export abstract class KeyboardHelper implements OnDestroy {
 
   abstract handleSoftLeftButton() : void;
   abstract handleSoftRightButton() : void;
@@ -13,9 +13,24 @@ export abstract class KeyboardHelper {
   abstract handleLeftButton() : void;
   abstract handleRightButton() : void;
 
+  protected isAttached = true;
+
+  ngOnAttach() {
+    this.isAttached = true;
+  }
+
+  ngOnDetach() {
+    this.isAttached = false;
+  }
   @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
-  //event.preventDefault();
+    if (!this.isAttached) {
+      //console.debug('[',this.constructor.name, '] : ', ' IGNORED keyEvent because component is not attached');
+      return;
+    } else {
+      //console.debug('[',this.constructor.name, '] : ', ' keyEvent : ', event.keyCode);
+    }
+
   event.stopPropagation();
 
   switch (event.keyCode) {
@@ -77,6 +92,13 @@ export abstract class KeyboardHelper {
 
     this.lastPlayTime = currentTime;
     audio.play();
+  }
+
+  ngOnDestroy() {
+    // Remove the event listener when the component is destroyed
+    // console.debug : print the name of the class destructed
+    console.debug(this.constructor.name + ' destroyed');
+    window.removeEventListener('keydown', this.keyEvent);
   }
 
 }

@@ -11,7 +11,9 @@ export enum BaseListItemType {
   ARTIST,
   ALBUM,
   PLAYLIST,
-  TRACK
+  TRACK,
+  ACTION,
+  QUEUE_TRACK
 }
 
 export class BaseListItem implements BaseItem {

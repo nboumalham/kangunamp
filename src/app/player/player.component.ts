@@ -5,7 +5,6 @@ import {JellyfinService} from '../services/jellyfin.service';
 import {AudioService} from '../services/audio.service';
 import {DeviceType, SharedService} from '../services/shared.service';
 
-
 import {BaseListItem, BaseListItemType, TrackItem} from '../models/list-item.model';
 import {KeyboardHelper} from '../helpers/keyboard.helper'
 import {Observable} from "rxjs";
@@ -14,7 +13,7 @@ import {Router} from "@angular/router";
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
-  styleUrls: ['./player.component.scss']
+  styleUrls: ['./player.component.scss'],
 })
 export class PlayerComponent extends KeyboardHelper implements OnInit {
 
@@ -99,7 +98,7 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
   handleCenterButton() {
     switch (this.controlsIndex) {
       case 0 :
-        this.sharedService.updateViewIndexHistory({index: this.controlsIndex, totalItems : this.controlsList.length, scrollTop : 0})
+        this.sharedService.updateViewIndexHistory({index: this.controlsIndex, totalItems : this.controlsList.length, scrollTop : 0}, {index: this.audioService.currentAudioIndex, totalItems: this.audioService.audioQueue.length, scrollTop: 0} )
         this.router.navigate(['/queue']);
         return;
       case 1 :
@@ -154,6 +153,27 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     this.controlsIndex = this.controlsList.indexOf(item);
     this.controlsList[this.controlsIndex].selected = true;
     this.handleCenterButton();
+  }
+
+  onDragEnd(event: any) {
+    const percentageDragged = event.detail.percentage;
+    // Call your method with the percentage dragged from X = 0
+    this.audioService.seekAudioPercent(percentageDragged);
+  }
+
+  onProgressClick(event: MouseEvent) {
+    // Check if the circle-handle is currently being dragged
+      // Calculate the percentage based on the click position relative to the progress-container
+      const progressContainer = document.querySelector('.progress-container');
+      if (progressContainer) {
+        const clickX = event.clientX - progressContainer.getBoundingClientRect().left;
+        const containerWidth = progressContainer.clientWidth;
+        const percentage = (clickX / containerWidth) * 100;
+
+        // Call your seek method with the calculated percentage
+        this.audioService.seekAudioPercent(percentage);
+      }
+
   }
 
   protected readonly DeviceType = DeviceType;

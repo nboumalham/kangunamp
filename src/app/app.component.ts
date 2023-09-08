@@ -3,6 +3,7 @@ import {slideAnimation} from "./animations";
 import {ChildrenOutletContexts} from "@angular/router";
 import {SharedService} from "./services/shared.service";
 import {Location} from "@angular/common";
+import {JellyfinService} from "./services/jellyfin.service";
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ import {Location} from "@angular/common";
 })
 export class AppComponent {
   title = 'kangunamp';
-  constructor(private contexts: ChildrenOutletContexts, private sharedService : SharedService, private location : Location) {}
+  constructor(private contexts: ChildrenOutletContexts, private sharedService : SharedService, private location : Location, jellyfinService : JellyfinService) {}
 
 
   getRouteAnimationData() {
