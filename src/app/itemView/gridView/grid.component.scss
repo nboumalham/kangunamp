@@ -54,24 +54,24 @@ div.card {
       margin: auto;
     }
   }
-  p.name {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding : 5% 8%;
-    height: $item-font-size;
-  }
-
-  p.description {
-    //font-size: $list-item-font-size;
-    color: $secondary-text-color;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  p.icon {
-    margin: auto;
+  div.infos {
+    padding: 3vh 2vw;
+    p.name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding : 0;
+      height: $item-font-size;
+      margin: 0 0 0 0;
+    }
+    p.description {
+      color: $secondary-text-color;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0 0 0 0;
+      padding: 0;
+    }
   }
 }
 }

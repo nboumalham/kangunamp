@@ -6,7 +6,10 @@
             <img [src]="item.imageURL"/>
         </ng-container>
       </div>
-      <p class="name small">{{ item.title }}</p>
+      <div class="infos">
+        <p class="name small">{{ item.title }}</p>
+        <p class="description xsmall">{{ item.subtitle }}</p>
+      </div>
     </div>
   </div>
 </div>

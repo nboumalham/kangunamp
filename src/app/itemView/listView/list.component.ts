@@ -1,6 +1,7 @@
 import {Component } from '@angular/core';
 import {ItemComponent} from "../item.component";
 import {KeyboardHelper} from "../../helpers/keyboard.helper";
+import {BaseListItemType} from "../../models/list-item.model";
 
 @Component({
   selector: 'item-list',
@@ -10,7 +11,7 @@ import {KeyboardHelper} from "../../helpers/keyboard.helper";
 })
 export class ListComponent extends ItemComponent {
 
-  /** ITEMCOMPONENT METHODS **/
+ /** ITEMCOMPONENT METHODS **/
   scrollToSelected(attempts = 5, delay = 50): void {
     if (attempts <= 0) {
       console.warn('Failed to scroll to selected item after maximum attempts');
@@ -64,4 +65,5 @@ export class ListComponent extends ItemComponent {
   handleRightButton(): void {
   }
 
+  protected readonly BaseListItemType = BaseListItemType;
 }

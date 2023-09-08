@@ -19,20 +19,23 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { HybridViewComponent } from './itemView/hybrid-view/hybrid-view.component';
 import {LazyImageDirective} from "./directives/lazy-image.directive";
 import {PwaService} from "./services/pwa.service";
+import {RouteReuseStrategy} from "@angular/router";
+import {DraggableDirective} from "./directives/draggable.directive";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    ListComponent,
-    GridComponent,
-    PlayerComponent,
-    AuthComponent,
-    HeaderComponent,
-    OnScreenKeyboardComponent,
-    AudioQueueComponent,
-    HybridViewComponent,
-    LazyImageDirective
-  ],
+    declarations: [
+        AppComponent,
+        ListComponent,
+        GridComponent,
+        PlayerComponent,
+        AuthComponent,
+        HeaderComponent,
+        OnScreenKeyboardComponent,
+        AudioQueueComponent,
+        HybridViewComponent,
+        LazyImageDirective,
+        DraggableDirective
+    ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -46,7 +49,9 @@ import {PwaService} from "./services/pwa.service";
       registrationStrategy: 'registerWhenStable:30000'
     }),
   ],
-  providers: [AudioService, PwaService],
+  providers: [
+    AudioService,
+    PwaService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
