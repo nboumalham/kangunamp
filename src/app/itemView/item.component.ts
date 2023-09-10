@@ -115,7 +115,6 @@ export abstract class ItemComponent extends KeyboardHelper implements OnInit, Af
     this.config.onSelectItem(item, this.itemList);
   };
   protected nextItem() {
-    this.playClickSound();
     // Your row selection code
     this.itemList[this.index].selected = false;
     if (this.index+1 < this.itemList.length) {
@@ -127,7 +126,6 @@ export abstract class ItemComponent extends KeyboardHelper implements OnInit, Af
     this.scrollToSelected();
   }
   protected previousItem() {
-    this.playClickSound();
     // Your row selection code
     this.itemList[this.index].selected = false;
 

@@ -15,24 +15,10 @@ export abstract class KeyboardHelper implements OnDestroy {
 
   protected isAttached = true;
 
-  ngOnAttach() {
-    this.isAttached = true;
-  }
-
-  ngOnDetach() {
-    this.isAttached = false;
-  }
   @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    if (!this.isAttached) {
-      //console.debug('[',this.constructor.name, '] : ', ' IGNORED keyEvent because component is not attached');
-      return;
-    } else {
-      //console.debug('[',this.constructor.name, '] : ', ' keyEvent : ', event.keyCode);
-    }
-
   event.stopPropagation();
-
+  this.playClickSound();
   switch (event.keyCode) {
     case KEY_CODE.DOWN_ARROW:
       this.handleDownButton();
@@ -74,7 +60,7 @@ export abstract class KeyboardHelper implements OnDestroy {
 
 
 //handling UI sounds
-  clickSoundPath = "../../assets/sounds/click.mp3";
+  clickSoundPath = "/assets/sounds/click.mp3";
   debounceTimeout : any;
   lastPlayTime = 0;
 

@@ -1,16 +1,17 @@
-<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.98), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.98)),url(' + (currentTrack | async)?.backdropImage + ')'">
+<div class="now-playing-container" [style.backgroundImage]="'linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.5)),url(' + (currentTrack | async)?.backdropImage + ')'">
   <div class="image-container">
     <div class="album-image">
       <img [src]="(currentTrack | async)?.imageURL"/>
     </div>
   </div>
   <div class="progress-info-container">
-    <div class="now-playing-info">
+    <div (mousemove)="toggleFocus('progress')">
+    <div class="now-playing-text">
       <span *ngIf="(audioService.getPlaylistIndex() | async) !== '1 of 1'" class="now-playing-artist">{{ audioService.getPlaylistIndex() | async }}</span>
       <h3 class="now-playing-title">{{ (currentTrack | async)?.title }}</h3>
       <span class="now-playing-artist">{{ (currentTrack | async)?.albumArtists }}</span>
     </div>
-    <div class="progress-container" (click)="onProgressClick($event)">
+    <div class="progress-container" (click)="onProgressClick($event)" [class.selected]="focusedElement === 'progress'">
       <div class="load-bar" [style.width]="(audioService.getPercentLoaded() | async) + '%'"></div>
       <div class="progress-bar" [style.width]="(audioService.getPercentElapsed() | async) + '%'"></div>
       <div class="circle-handle" appDraggable (dragend)="onDragEnd($event)" [style.margin-left]="(audioService.getPercentElapsed() | async) + '%'"></div>
@@ -19,11 +20,11 @@
       <div class="current-time">{{ audioService.getTimeElapsed() | async }}</div>
       <div class="duration">{{ audioService.getTimeRemaining() | async }}</div>
     </div>
-    <div class ="controls-container">
-       <span *ngFor="let item of controlsList" class="list-item" [class.selected]="item.selected" [class.large]="sharedService.isDeviceMobile()" (click)="clickItem(item)">
+    </div>
+    <div class ="controls-container" (mousemove)="toggleFocus('controls')">
+       <span *ngFor="let item of controlsList" class="list-item" [class.selected]="item.selected && focusedElement === 'controls' && !sharedService.isDeviceMobile()" [class.large]="sharedService.isDeviceMobile()" (click)="clickItem(item)">
          <i [class]="item.subtitle"></i>
        </span>
-
     </div>
   </div>
 </div>

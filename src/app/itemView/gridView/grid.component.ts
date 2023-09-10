@@ -17,7 +17,6 @@ export class GridComponent  extends ItemComponent {
     this.nextItem();
   }
   handleDownButton() {
-    this.playClickSound();
     // Your row selection code
     this.itemList[this.index].selected = false;
     if (this.index + this.sharedService.getBreakpoint() < this.itemList.length) {
@@ -29,7 +28,6 @@ export class GridComponent  extends ItemComponent {
     this.scrollToSelected();
   }
   handleUpButton() {
-    this.playClickSound();
     // Your row selection code
     this.itemList[this.index].selected = false;
 

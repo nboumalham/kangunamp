@@ -47,20 +47,19 @@
       margin: auto auto auto 0;
       text-align: left;
     }
-    .now-playing-info {
-      display: block;
+    .now-playing-text {
       .now-playing-title, .now-playing-artist {
-        //font-size: var(--player-font-size);
         margin: 0.2vh 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         width: 100%;
         color: $primary-text-color;
+        display: block;
       }
       .now-playing-artist {
         color: $secondary-text-color;
-        //font-size: calc(var(--player-font-size) * 0.8);
+        display: block;
       }
     }
 
@@ -86,14 +85,21 @@
         transition: width 0.1s ease-in-out;
         border-radius: 15px;
       }
-      .circle-handle {
-        width: 1.5vh;
-        height: 1.5vh;
-        background-color: $primary-active-color;
-        border: .5vh solid darken($primary-selected-text-color, 2%);
-        border-radius: 50%;
-        transform: translateY(-2.5vh) translateX(-.5vh);
-        cursor: pointer;
+        .circle-handle {
+          opacity: 0;
+          transition: opacity 300ms ease-in-out;
+          width: 1vh;
+          height: 1vh;
+          background-color: $primary-active-color;
+          border: .5vh solid darken($primary-selected-text-color, 2%);
+          border-radius: 50%;
+          transform: translateY(-2.5vh) translateX(-.5vh);
+          cursor: pointer;
+        }
+      &.selected {
+        .circle-handle {
+          opacity: 1;
+      }
       }
     }
 

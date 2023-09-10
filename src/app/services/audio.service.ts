@@ -21,7 +21,13 @@ export class AudioService {
     public currentAudioIndex: number = 0;
     public shuffle: boolean = false;
 
-    constructor() {
+
+    //For playing audio
+    private retryTimeout: any; // Variable to store the setTimeout reference
+    private retryAttempted: boolean = false; // Flag to track if a retry has been attempted
+
+
+  constructor() {
         this.audio = new Audio();
         this.attachListeners();
     }
@@ -94,12 +100,6 @@ export class AudioService {
         });
         navigator.mediaSession.setActionHandler('nexttrack', () => {
           this.playNextAudio();
-        });
-        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-          this.seekAudioBackwards(details.seekOffset);
-        });
-        navigator.mediaSession.setActionHandler('seekforward', (details) => {
-          this.seekAudioForward(details.seekOffset);
         });
       }
     }
@@ -227,8 +227,26 @@ export class AudioService {
      * The method to play audio
      */
      public playAudio(): void {
-         this.audio.play();
+       this.playAudioWithRetry();
      }
+
+  private playAudioWithRetry(): void {
+    // Clear any previous retry timeouts
+    clearTimeout(this.retryTimeout);
+
+    // Attempt to play the audio
+    this.audio.play();
+
+    // Set a timeout to retry after 5 seconds if it doesn't play
+    this.retryTimeout = setTimeout(() => {
+      if (this.playerStatus.value !== 'playing' && !this.retryAttempted) {
+        // Retry only if the audio is not playing and retry hasn't been attempted yet
+        this.retryAttempted = true;
+        this.loadCurrentAudio(); // Reload the audio
+        this.playAudioWithRetry(); // Retry playing
+      }
+    }, 5000);
+  }
 
     /**
      * The method to pause audio
@@ -250,11 +268,11 @@ export class AudioService {
     this.audio.currentTime = (this.audio.duration / 100) * positionPercent;
   }
 
-  public seekAudioForward(delta: number = 100): void {
+  public seekAudioForward(delta: number = 10): void {
     this.audio.currentTime += delta;
   }
 
-  public seekAudioBackwards(delta: number = 100): void {
+  public seekAudioBackwards(delta: number = 10): void {
     this.audio.currentTime -= delta;
   }
 

@@ -19,6 +19,7 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
 
   currentTrack! : Observable<TrackItem>;
 
+  public focusedElement: 'controls' | 'progress' = 'controls';
   public controlsList : BaseListItem[] = [];
   public controlsIndex = 2;
 
@@ -96,27 +97,33 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     this.audioService.playNextAudio();
   }
   handleCenterButton() {
-    switch (this.controlsIndex) {
-      case 0 :
-        this.sharedService.updateViewIndexHistory({index: this.controlsIndex, totalItems : this.controlsList.length, scrollTop : 0}, {index: this.audioService.currentAudioIndex, totalItems: this.audioService.audioQueue.length, scrollTop: 0} )
-        this.router.navigate(['/queue']);
-        return;
-      case 1 :
-        this.audioService.playPreviousAudio();
-        return;
-      case 2 :
-        this.audioService.toggleAudio();
-        return;
-      case 3 :
-        this.audioService.playNextAudio();
-        return;
+    if(this.focusedElement === 'controls') {
+      switch (this.controlsIndex) {
+        case 0 :
+          this.sharedService.updateViewIndexHistory({index: this.controlsIndex, totalItems : this.controlsList.length, scrollTop : 0}, {index: this.audioService.currentAudioIndex, totalItems: this.audioService.audioQueue.length, scrollTop: 0} )
+          this.router.navigate(['/queue']);
+          return;
+        case 1 :
+          this.audioService.playPreviousAudio();
+          return;
+        case 2 :
+          this.audioService.toggleAudio();
+          return;
+        case 3 :
+          this.audioService.playNextAudio();
+          return;
         case 4 :
           this.audioService.toggleShuffle()
           this.controlsList[this.controlsIndex].subtitle = "icon-shuffle " + (this.audioService.shuffle ? "toggled" : "");
-    }
+        }
+      }
   }
-  handleUpButton() {}
-  handleDownButton() {}
+  handleUpButton() {
+    this.toggleFocus();
+  }
+  handleDownButton() {
+    this.toggleFocus();
+  }
   handleBackButton() {
     if (this.sharedService.getStackSize() > 1) {
       this.sharedService.popViewIndex();
@@ -124,7 +131,9 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
     }
   }
   handleRightButton() {
-    this.playClickSound();
+    if(this.focusedElement === 'progress') {
+      this.audioService.seekAudioForward();
+    } else {
     // Your row selection code
     this.controlsList[this.controlsIndex].selected = false;
     if (this.controlsIndex+1 < this.controlsList.length) {
@@ -133,9 +142,12 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
       this.controlsIndex = 0;
     }
     this.controlsList[this.controlsIndex].selected = true;
+    }
   }
   handleLeftButton() {
-    this.playClickSound();
+    if(this.focusedElement === 'progress') {
+      this.audioService.seekAudioBackwards();
+    } else {
     // Your row selection code
     this.controlsList[this.controlsIndex].selected = false;
 
@@ -145,10 +157,10 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
       this.controlsIndex--;
     }
     this.controlsList[this.controlsIndex].selected = true;
+    }
   }
 
   clickItem(item: BaseListItem) {
-    this.playClickSound();
     this.controlsList[this.controlsIndex].selected = false;
     this.controlsIndex = this.controlsList.indexOf(item);
     this.controlsList[this.controlsIndex].selected = true;
@@ -175,6 +187,12 @@ export class PlayerComponent extends KeyboardHelper implements OnInit {
       }
 
   }
+
+  protected toggleFocus(option? : "controls" | "progress") {
+    if(option) this.focusedElement = option;
+    else this.focusedElement = this.focusedElement === 'controls' ? 'progress' : 'controls';
+  }
+
 
   protected readonly DeviceType = DeviceType;
 }
